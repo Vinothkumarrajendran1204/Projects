@@ -3925,3 +3925,109 @@ img {
 }
 
 
+/* Grouped portal navigation: identity row + compact navigation row. */
+.main-header .nav-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0;
+  padding-top: 1rem;
+  padding-bottom: 0;
+}
+.main-header .brand-logo-area { min-width: 0; }
+.main-header .brand-text { min-width: 0; }
+.main-header .brand-title,
+.main-header .brand-sub { white-space: normal; }
+.main-header .nav-right-actions { grid-column: 2; grid-row: 1; margin-left: 1rem; }
+.main-header .nav-links {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: flex;
+  position: static;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 1rem;
+  padding: 0.6rem 0;
+  border: 0;
+  border-top: 1px solid var(--border-light);
+  border-radius: 0;
+  box-shadow: none;
+  min-width: 0;
+}
+.main-header .nav-link { width: auto; min-height: 42px; padding: 0.6rem 1rem; font-size: 0.85rem; justify-content: flex-start; }
+.main-header .btn-menu-toggle { display: none; }
+.nav-group { position: relative; }
+.nav-group summary { cursor: pointer; list-style: none; gap: 0.65rem; }
+.nav-group summary::-webkit-details-marker { display: none; }
+.nav-group[open] > summary { background: var(--primary-subtle); color: var(--primary); }
+.nav-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 230px;
+  padding: 0.5rem;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: var(--shadow-lg);
+  z-index: 210;
+}
+.nav-group-label { display: block; padding: 0.6rem 0.75rem; color: var(--text-muted); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
+.nav-dropdown button { display: block; width: 100%; text-align: left; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem; color: var(--text-secondary); }
+.nav-dropdown button:hover,
+.nav-dropdown button.active { background: var(--primary-subtle); color: var(--primary); }
+.main-header :is(button, summary):focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.nav-utilities { margin-left: auto; display: flex; align-items: center; gap: 0.65rem; min-width: 0; }
+.nav-tools .nav-dropdown { left: auto; right: 0; }
+.nav-utilities .location-quick-badge { max-width: 260px; }
+.nav-utilities .location-quick-badge span { overflow: hidden; text-overflow: ellipsis; }
+.main-header .user-info-text { min-width: 0; }
+.main-header .user-name-text { max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+.govt-top-strip .govt-helpline { flex-wrap: wrap; gap: 0.4rem 1rem; }
+@media (max-width: 1100px) {
+  .govt-top-strip .helpline-pill { display: none; }
+}
+@media (max-width: 768px) {
+  .main-header .nav-container { padding-top: 0.8rem; padding-bottom: 0.8rem; row-gap: 0.75rem; }
+  .main-header .brand-logo-area { grid-column: 1; grid-row: 1; gap: 0.5rem; }
+  .main-header .brand-title { font-size: 1rem; }
+  .main-header .brand-sub { display: block; font-size: 0.58rem; margin-top: 0.2rem; }
+  .main-header .nav-right-actions { display: contents; }
+  .main-header .nav-right-actions > .user-profile-pill,
+  .main-header .nav-right-actions > .btn-login { grid-row: 2; grid-column: 1 / -1; justify-self: start; max-width: 100%; }
+  .main-header .btn-menu-toggle { display: inline-flex; grid-column: 2; grid-row: 1; width: 44px; height: 44px; margin-left: 0.65rem; }
+  .main-header .nav-links { display: none; grid-row: 3; margin: 0; padding-top: 0.75rem; padding-bottom: 0; max-height: 60dvh; overflow-y: auto; }
+  .main-header .nav-links.open { display: flex; flex-direction: column; align-items: stretch; }
+  .main-header .nav-link { width: 100%; min-height: 44px; justify-content: space-between; }
+  .main-header .nav-dropdown { position: static; width: 100%; box-shadow: none; border: 0; border-left: 2px solid var(--border-light); border-radius: 0; margin: 0.25rem 0; }
+  .main-header .nav-utilities { margin: 0.5rem 0 0; padding-top: 0.75rem; border-top: 1px solid var(--border-light); flex-direction: column; align-items: stretch; }
+  .nav-utilities .location-quick-badge { max-width: 100%; align-self: flex-start; min-height: 44px; }
+  .govt-top-strip { font-size: 0.65rem; }
+  .govt-top-strip .govt-tagline { align-items: flex-start; }
+  .govt-top-strip .govt-helpline { font-size: 0.65rem; }
+}
+@media (max-width: 768px) {
+  .main-header .nav-right-actions > .user-profile-pill,
+  .main-header .nav-right-actions > .btn-login {
+    width: auto !important;
+    height: 40px !important;
+    padding: 0.3rem 0.65rem !important;
+    justify-content: flex-start !important;
+  }
+  .main-header .user-info-text { display: flex !important; }
+  .main-header .user-name-text { display: block; max-width: 155px; }
+  .main-header .btn-login span { display: inline !important; }
+  .main-header .location-quick-badge span { max-width: none; }
+}
+.nav-chevron { width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); margin: -3px 2px 0 4px; }
+.nav-group[open] > summary .nav-chevron { transform: rotate(225deg); margin-top: 3px; }
+.dummy-aadhaar-form { display: grid; gap: 0.65rem; }
+.dummy-aadhaar-form label { font-size: 0.82rem; font-weight: 600; }
+.dummy-aadhaar-form input { width: 100%; min-width: 0; }
+.dummy-aadhaar-card { display: flex; flex-direction: column; align-items: flex-start; gap: 0.3rem; width: 100%; overflow-wrap: anywhere; }
+.dummy-aadhaar-card:disabled { opacity: 1; cursor: default; }
+.dummy-db-dialog { display: flex; flex-direction: column; max-height: 90dvh; }
+.dummy-db-dialog .modal-header { flex-shrink: 0; }
+.dummy-db-dialog .modal-body { min-height: 0; overflow-y: auto; }
+.dummy-aadhaar-form input { background-image: none; }
+.dummy-aadhaar-card:disabled { color: var(--text-primary); -webkit-text-fill-color: var(--text-primary); }

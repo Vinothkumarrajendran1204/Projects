@@ -74,7 +74,7 @@ const TasmacComponents = {
       userPillHtml = `
         <button class="btn-login" onclick="tasmacApp.openLoginModal()">
           ${this.icons.user}
-          <span>Citizen Login (Aadhaar OTP)</span>
+          <span>Citizen Login</span>
         </button>
       `;
     }
@@ -91,61 +91,48 @@ const TasmacComponents = {
             </div>
           </div>
 
-          <ul class="nav-links" id="mainNavLinks">
-            <li class="nav-item">
-              <a href="javascript:void(0)" class="nav-link ${activeView === 'home' ? 'active' : ''}" onclick="tasmacStore.setView('home')">Home</a>
-            </li>
-            <li class="nav-item">
-              <a href="javascript:void(0)" class="nav-link ${activeView === 'shops' ? 'active' : ''}" onclick="tasmacStore.setView('shops')">Nearby Shops</a>
-            </li>
-            <li class="nav-item">
-              <a href="javascript:void(0)" class="nav-link ${activeView === 'shop-detail' ? 'active' : ''}" onclick="tasmacStore.setView('shop-detail')">Shop Products</a>
-            </li>
-            <li class="nav-item">
-              <a href="javascript:void(0)" class="nav-link ${activeView === 'limits' ? 'active' : ''}" onclick="tasmacStore.setView('limits')">My Limits</a>
-            </li>
-            <li class="nav-item">
-              <a href="javascript:void(0)" class="nav-link ${activeView === 'awareness' ? 'active' : ''}" onclick="tasmacStore.setView('awareness')">Alcohol Awareness</a>
-            </li>
-            <li class="nav-item">
-              <a href="javascript:void(0)" class="nav-link ${activeView === 'my-bookings' ? 'active' : ''}" onclick="tasmacStore.setView('my-bookings')">My Bookings</a>
-            </li>
-            <li class="nav-item">
-              <a href="javascript:void(0)" class="nav-link ${activeView === 'history' ? 'active' : ''}" onclick="tasmacStore.setView('history')">Purchase History</a>
-            </li>
-          </ul>
+          <nav class="nav-links" id="mainNavLinks" aria-label="Main navigation">
+            <button class="nav-link ${activeView === 'home' ? 'active' : ''}" onclick="tasmacStore.setView('home')">Home</button>
+            <details class="nav-group">
+              <summary class="nav-link ${['shops', 'shop-detail'].includes(activeView) ? 'active' : ''}">Shop <span class="nav-chevron" aria-hidden="true"></span></summary>
+              <div class="nav-dropdown">
+                <span class="nav-group-label">Browse & book</span>
+                <button class="${activeView === 'shops' ? 'active' : ''}" onclick="tasmacStore.setView('shops')">Nearby Shops</button>
+                <button class="${activeView === 'shop-detail' ? 'active' : ''}" onclick="tasmacStore.setView('shop-detail')">Shop Products</button>
+              </div>
+            </details>
+            <details class="nav-group">
+              <summary class="nav-link ${['limits', 'my-bookings', 'history'].includes(activeView) ? 'active' : ''}">My Account <span class="nav-chevron" aria-hidden="true"></span></summary>
+              <div class="nav-dropdown">
+                <span class="nav-group-label">Your activity</span>
+                <button class="${activeView === 'limits' ? 'active' : ''}" onclick="tasmacStore.setView('limits')">My Limits</button>
+                <button class="${activeView === 'my-bookings' ? 'active' : ''}" onclick="tasmacStore.setView('my-bookings')">My Bookings</button>
+                <button class="${activeView === 'history' ? 'active' : ''}" onclick="tasmacStore.setView('history')">Purchase History</button>
+              </div>
+            </details>
+            <button class="nav-link ${activeView === 'awareness' ? 'active' : ''}" onclick="tasmacStore.setView('awareness')">Awareness</button>
+            <div class="nav-utilities">
+              <button class="location-quick-badge" onclick="tasmacApp.closeMobileMenu(); tasmacApp.openLocationModal()" title="Change District or City">
+                ${this.icons.mapPin}<span>${state.selectedDistrict} (${state.selectedCity})</span>
+              </button>
+              <details class="nav-group nav-tools">
+                <summary class="nav-link">Tools <span class="nav-chevron" aria-hidden="true"></span></summary>
+                <div class="nav-dropdown">
+                  <span class="nav-group-label">Demo & administration</span>
+                  <button onclick="tasmacApp.closeMobileMenu(); tasmacApp.openDummyAadhaarDatabase()">Dummy Aadhaar Database</button>
+                  <button onclick="tasmacApp.closeMobileMenu(); tasmacApp.openPersonaModal()">Switch Demo Persona</button>
+                  <button onclick="tasmacApp.closeMobileMenu(); ${!isAdmin ? 'tasmacApp.openAdminLoginModal()' : "tasmacStore.setView('admin')"}">${!isAdmin ? 'Officer Login' : 'Admin Portal'}</button>
+                </div>
+              </details>
+            </div>
+          </nav>
 
           <div class="nav-right-actions">
-            <!-- District/City Quick Switcher -->
-            <button class="location-quick-badge" onclick="tasmacApp.openLocationModal()" title="Change District or City">
-              ${this.icons.mapPin}
-              <span>${state.selectedDistrict} (${state.selectedCity})</span>
-            </button>
-
-            <!-- 1-Click Demo Persona Switcher -->
-            <div class="persona-dropdown-wrapper">
-              <button class="persona-selector-btn" onclick="tasmacApp.openPersonaModal()" title="Switch test persona">
-                <span>🎭 Demo Persona</span>
-              </button>
-            </div>
-
             <!-- User Auth Pill -->
             ${userPillHtml}
 
-            <!-- Admin Toggle Button -->
-            ${!isAdmin ? `
-              <button class="btn-admin-switch" onclick="tasmacApp.openAdminLoginModal()" title="Authorized Officer Access">
-                ${this.icons.shield}
-                <span>Admin</span>
-              </button>
-            ` : `
-              <button class="btn-admin-switch" style="background:#0284c7;" onclick="tasmacStore.setView('admin')">
-                <span>Portal View</span>
-              </button>
-            `}
-
             <!-- Mobile Menu Toggle Button -->
-            <button class="btn-menu-toggle" id="btnMenuToggle" onclick="tasmacApp.toggleMobileMenu()" title="Toggle Navigation Menu" aria-label="Toggle navigation">
+            <button class="btn-menu-toggle" id="btnMenuToggle" onclick="tasmacApp.toggleMobileMenu()" title="Toggle Navigation Menu" aria-label="Toggle navigation" aria-controls="mainNavLinks" aria-expanded="false">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="3" y1="12" x2="21" y2="12"></line>
                 <line x1="3" y1="6" x2="21" y2="6"></line>

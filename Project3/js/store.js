@@ -6,6 +6,7 @@
 class TasmacStore {
   constructor() {
     this.STORAGE_KEY = "TASMAC_SMART_PORTAL_STATE_V1";
+    this.AADHAAR_DB_KEY = "TASMAC_DUMMY_AADHAAR_DB_V1";
     this.listeners = [];
     this.loadState();
   }
@@ -47,15 +48,27 @@ class TasmacStore {
       legalRestrictions: initial?.legalRestrictions || JSON.parse(JSON.stringify(data.legalRestrictions || []))
     };
 
-    // If no currentUser is set, default to first demo user for smooth testing experience
-    if (!this.state.currentUser && !this.state.isAdmin) {
-      this.state.currentUser = this.state.users[0];
+    if (localStorage.getItem(this.AADHAAR_DB_KEY) === null) {
+      localStorage.setItem(this.AADHAAR_DB_KEY, JSON.stringify((data.demoUsers || []).map(user => ({
+        aadhaarNumber: user.aadhaarNumber, name: user.name,
+        mobile: user.phone.replace(/\D/g, "").slice(-10), district: user.district, city: user.city
+      }))));
     }
+    // Seed dummy records immediately and preserve only sessions from this login flow.
+    this.state.currentUser = initial?.authVersion === 2
+      ? this.state.users.find(user => user.aadhaarNumber === initial.currentUser?.aadhaarNumber) || null
+      : null;
+    try {
+      if (this.state.currentUser && !this.getDummyAadhaarRecords().some(record => record.aadhaarNumber === this.state.currentUser.aadhaarNumber)) this.state.currentUser = null;
+    } catch { this.state.currentUser = null; }
+    this.pendingOtp = null;
+    this.saveState();
   }
 
   saveState() {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify({
+        authVersion: 2,
         currentUser: this.state.currentUser,
         isAdmin: this.state.isAdmin,
         selectedDistrict: this.state.selectedDistrict,
@@ -112,36 +125,78 @@ class TasmacStore {
     this.notify();
   }
 
+  getDummyAadhaarRecords() {
+    try {
+      const records = JSON.parse(localStorage.getItem(this.AADHAAR_DB_KEY));
+      if (!Array.isArray(records) || records.some(record => !record ||
+        !/^\d{12}$/.test(record.aadhaarNumber) || !/^\d{10}$/.test(record.mobile) ||
+        typeof record.name !== "string" || !record.name.trim() || /[<>&"']/.test(record.name))) throw new Error();
+      return records;
+    } catch {
+      throw new Error("The dummy Aadhaar database cannot be read. Fix its records before logging in.");
+    }
+  }
+
+  addDummyAadhaarRecord({ aadhaarNumber, name, mobile }) {
+    aadhaarNumber = String(aadhaarNumber).replace(/\s+/g, "");
+    mobile = String(mobile).replace(/\s+/g, "");
+    name = String(name).trim();
+    if (!/^\d{12}$/.test(aadhaarNumber)) throw new Error("Dummy Aadhaar must contain exactly 12 digits.");
+    if (!/^\d{10}$/.test(mobile)) throw new Error("Linked mobile must contain exactly 10 digits.");
+    if (name.length < 2 || name.length > 80 || /[<>&"']/.test(name)) throw new Error("Enter a name between 2 and 80 characters using letters, spaces or periods.");
+    const records = this.getDummyAadhaarRecords();
+    if (records.some(record => record.aadhaarNumber === aadhaarNumber)) throw new Error("This Aadhaar already exists in the dummy database.");
+    const record = { aadhaarNumber, name, mobile, district: this.state.selectedDistrict, city: this.state.selectedCity === "All" ? "Central" : this.state.selectedCity };
+    localStorage.setItem(this.AADHAAR_DB_KEY, JSON.stringify([...records, record]));
+    return record;
+  }
+
   // User Auth & Persona switching
-  loginUser(aadhaarNumber) {
-    const cleanNum = aadhaarNumber.replace(/\s+/g, "");
-    let user = this.state.users.find(u => u.aadhaarNumber === cleanNum);
-    
+  requestLoginOtp(aadhaarNumber) {
+    this.pendingOtp = null;
+    const clean = String(aadhaarNumber).replace(/\s+/g, "");
+    if (!/^\d{12}$/.test(clean)) throw new Error("Enter a 12-digit dummy Aadhaar number.");
+    const user = this.getDummyAadhaarRecords().find(record => record.aadhaarNumber === clean);
+    if (!user) throw new Error("Aadhaar not found in the demo records. No OTP generated. Choose a registered dummy card below.");
+    const random = new Uint32Array(1);
+    crypto.getRandomValues(random);
+    const code = String(100000 + random[0] % 900000);
+    this.pendingOtp = { aadhaar: clean, mobile: user.mobile, name: user.name, code, expiresAt: Date.now() + 60000, attempts: 0 };
+    return { ...this.pendingOtp, phoneMasked: "+91 ******" + user.mobile.slice(-4) };
+  }
+
+  loginUser(aadhaarNumber, otp) {
+    const clean = String(aadhaarNumber).replace(/\s+/g, "");
+    const pending = this.pendingOtp;
+    if (!pending || pending.aadhaar !== clean) throw new Error("Request a demo OTP for this Aadhaar first.");
+    if (Date.now() >= pending.expiresAt) {
+      this.pendingOtp = null;
+      throw new Error("OTP expired. Please request a new OTP.");
+    }
+    if (otp !== pending.code) {
+      pending.attempts++;
+      if (pending.attempts >= 5) {
+        this.pendingOtp = null;
+        throw new Error("Too many incorrect attempts. Request a new OTP.");
+      }
+      throw new Error("Incorrect OTP. Check the demo code and try again.");
+    }
+    const record = this.getDummyAadhaarRecords().find(record => record.aadhaarNumber === clean);
+    if (!record || record.mobile !== pending.mobile || record.name !== pending.name) {
+      this.pendingOtp = null;
+      throw new Error("The linked Aadhaar record changed or was removed. Request a new OTP.");
+    }
+    let user = this.state.users.find(user => user.aadhaarNumber === clean);
     if (!user) {
-      // Auto-register new mock citizen
-      const masked = "XXXX-XXXX-" + cleanNum.slice(-4);
       user = {
-        aadhaarNumber: cleanNum,
-        name: "Citizen " + cleanNum.slice(-4),
-        phone: "+91 98400 " + cleanNum.slice(-5),
-        phoneMasked: "+91 98*** **" + cleanNum.slice(-3),
-        district: this.state.selectedDistrict,
-        city: this.state.selectedCity !== "All" ? this.state.selectedCity : "Central",
-        isRestricted: false,
-        restrictionDetails: null,
-        weeklyQuota: {
-          alcoholUsedUnits: 0,
-          maxAlcoholUnits: 1.0,
-          alcoholResetDate: "2026-09-14T00:00:00+05:30",
-          highNicotineUsed: 0,
-          lowNicotineUsed: 0
-        },
-        personaBadge: "New Registered Citizen",
-        personaDescription: "Newly registered citizen via Aadhaar OTP."
+        aadhaarNumber: clean, isRestricted: false, restrictionDetails: null,
+        weeklyQuota: { alcoholUsedUnits: 0, maxAlcoholUnits: 1, highNicotineUsed: 0, lowNicotineUsed: 0, alcoholResetDate: new Date(Date.now() + 7 * 86400000).toISOString() },
+        personaBadge: "Registered Demo Citizen", personaDescription: "Verified using the separate dummy Aadhaar database."
       };
       this.state.users.push(user);
     }
-
+    Object.assign(user, { name: record.name, phone: "+91 " + record.mobile, phoneMasked: "+91 ******" + record.mobile.slice(-4), district: record.district, city: record.city });
+    this.pendingOtp = null;
     this.state.currentUser = user;
     this.state.isAdmin = false;
     this.notify();
@@ -160,6 +215,7 @@ class TasmacStore {
   }
 
   logout() {
+    this.pendingOtp = null;
     this.state.currentUser = null;
     this.state.isAdmin = false;
     this.state.activeView = "home";

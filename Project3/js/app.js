@@ -43,9 +43,12 @@ class TasmacApp {
     document.addEventListener("click", (e) => {
       const navLinks = document.getElementById("mainNavLinks");
       const toggleBtn = document.getElementById("btnMenuToggle");
+      document.querySelectorAll(".nav-group[open]").forEach(group => {
+        if (!group.contains(e.target)) group.open = false;
+      });
       if (navLinks && navLinks.classList.contains("open")) {
         if (!navLinks.contains(e.target) && (!toggleBtn || !toggleBtn.contains(e.target))) {
-          navLinks.classList.remove("open");
+          this.closeMobileMenu();
         }
       }
     });
@@ -56,11 +59,14 @@ class TasmacApp {
   toggleMobileMenu() {
     const navLinks = document.getElementById("mainNavLinks");
     if (navLinks) {
-      navLinks.classList.toggle("open");
+      const open = navLinks.classList.toggle("open");
+      document.getElementById("btnMenuToggle")?.setAttribute("aria-expanded", String(open));
     }
   }
 
   closeMobileMenu() {
+    document.querySelectorAll(".nav-group[open]").forEach(group => { group.open = false; });
+    document.getElementById("btnMenuToggle")?.setAttribute("aria-expanded", "false");
     const navLinks = document.getElementById("mainNavLinks");
     if (navLinks) {
       navLinks.classList.remove("open");
@@ -230,6 +236,8 @@ class TasmacApp {
   // ================= MODAL CONTROLLERS =================
 
   closeAllModals() {
+    tasmacStore.pendingOtp = null;
+    this.currentLoginDraft = null;
     const container = document.getElementById("modalContainer");
     if (container) container.innerHTML = "";
     if (this.otpTimer) {
@@ -386,8 +394,67 @@ class TasmacApp {
     this.showToast("Logged in as TASMAC Enforcement Officer (Admin Portal)", "success");
   }
 
+  escapeText(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+  }
+
+  renderDummyAadhaarCards(selectable = false) {
+    try {
+      const records = tasmacStore.getDummyAadhaarRecords();
+      return records.map(record => `
+        <button type="button" class="demo-user-button dummy-aadhaar-card" ${selectable ? `onclick="tasmacApp.quickFillLogin('${record.aadhaarNumber}')"` : 'disabled'}>
+          <strong>${this.escapeText(record.name)}</strong>
+          <span>Dummy Aadhaar: ${record.aadhaarNumber.replace(/(\d{4})(?=\d)/g, "$1 ")}</span>
+          <span>Linked mobile: +91 ${record.mobile}</span>
+        </button>`).join("") || '<p>No dummy records yet. Add one below before requesting an OTP.</p>';
+    } catch (error) { return `<p role="alert">${this.escapeText(error.message)}</p>`; }
+  }
+
+  openDummyAadhaarDatabase() {
+    this.closeAllModals();
+    document.getElementById("modalContainer").innerHTML = `
+      <div class="modal-overlay" onclick="if(event.target===this) tasmacApp.closeAllModals()">
+        <div class="modal-dialog dummy-db-dialog" role="dialog" aria-modal="true" aria-labelledby="dummyDbTitle">
+          <div class="modal-header"><h3 id="dummyDbTitle">Dummy Aadhaar Database</h3><button class="modal-close-btn" aria-label="Close" onclick="tasmacApp.closeAllModals()">&times;</button></div>
+          <div class="modal-body">
+            <p style="margin-bottom:1rem;">Add fictional identity details here first. Login matches these saved records and simulates an OTP to the linked mobile. No real SMS is sent.</p>
+            <form id="dummyAadhaarForm" class="dummy-aadhaar-form" onsubmit="event.preventDefault(); tasmacApp.saveDummyAadhaarRecord()">
+              <label for="dummyName">Full name</label><input id="dummyName" class="select-control" required minlength="2" maxlength="80" placeholder="Demo Citizen">
+              <label for="dummyAadhaar">Dummy Aadhaar number</label><input id="dummyAadhaar" class="select-control" required inputmode="numeric" pattern="[0-9]{12}" maxlength="12" placeholder="12 digits">
+              <label for="dummyMobile">Linked mobile number</label><input id="dummyMobile" class="select-control" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10 digits">
+              <p id="dummyDbStatus" role="status" aria-live="polite"></p>
+              <button type="submit" class="btn-primary">Save Dummy Record</button>
+              <button type="button" class="btn-outline" onclick="tasmacApp.openLoginModal()">Go to Citizen Login</button>
+            </form>
+            <h4 style="margin:1.5rem 0 0.75rem;">Saved dummy cards</h4>
+            <div id="dummyDbCards">${this.renderDummyAadhaarCards()}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  saveDummyAadhaarRecord() {
+    const status = document.getElementById("dummyDbStatus");
+    try {
+      tasmacStore.addDummyAadhaarRecord({
+        name: document.getElementById("dummyName").value,
+        aadhaarNumber: document.getElementById("dummyAadhaar").value,
+        mobile: document.getElementById("dummyMobile").value
+      });
+      document.getElementById("dummyAadhaarForm").reset();
+      document.getElementById("dummyDbCards").innerHTML = this.renderDummyAadhaarCards();
+      status.textContent = "Dummy record saved. Go to Citizen Login to request its OTP.";
+      status.style.color = "var(--primary)";
+    } catch (error) {
+      status.textContent = error.message;
+      status.style.color = "var(--danger)";
+    }
+  }
+
   // Login Modal (Section 1: Aadhaar & OTP)
   openLoginModal() {
+    clearInterval(this.otpTimer);
+    tasmacStore.pendingOtp = null;
     this.currentLoginDraft = { aadhaar: "", step: "aadhaar" };
     this.renderLoginModalContent();
   }
@@ -400,36 +467,23 @@ class TasmacApp {
     if (draft.step === "aadhaar") {
       bodyHtml = `
         <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.25rem;">
-          Enter your 12-digit Aadhaar number for mock OTP authentication. No real personal data is ever stored or exposed.
+          Use a dummy Aadhaar card below. Demo records are saved in this browser. Only a matching record can receive a simulated OTP. Do not enter real Aadhaar details.
         </p>
 
         <div style="margin-bottom:1.25rem;">
           <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.4rem;">AADHAAR NUMBER</label>
-          <input type="text" id="loginAadhaarInput" placeholder="4567 8901 2345" maxlength="14" class="select-control" style="width:100%; font-size:1.1rem; font-family:monospace; letter-spacing:0.1em;" oninput="tasmacApp.formatAadhaarInput(this)">
+          <input type="text" id="loginAadhaarInput" inputmode="numeric" placeholder="4567 8901 2345" maxlength="14" class="select-control" style="width:100%; font-size:1.1rem; font-family:monospace; letter-spacing:0.1em;" oninput="tasmacApp.formatAadhaarInput(this)">
         </div>
 
         <button class="btn-primary" style="width:100%; justify-content:center; padding:0.75rem;" onclick="tasmacApp.submitAadhaarForOtp()">
-          Send OTP to Linked Mobile
+          Generate Demo OTP
         </button>
 
         <div class="demo-account-picker">
-          <div class="demo-account-title">Or 1-Click Mock Test Login</div>
-          <button class="demo-user-button" onclick="tasmacApp.quickFillLogin('456789012345')">
-            <span>Rajesh Kannan (Clean Citizen - Full Quota)</span>
-            <span>4567 8901 2345</span>
-          </button>
-          <button class="demo-user-button" onclick="tasmacApp.quickFillLogin('345678901234')">
-            <span>S. Murugan (Active - 1 Beer Used)</span>
-            <span>3456 7890 1234</span>
-          </button>
-          <button class="demo-user-button" onclick="tasmacApp.quickFillLogin('901234567890')">
-            <span>M. Vijay (Limit Reached - 1 Full Bottle)</span>
-            <span>9012 3456 7890</span>
-          </button>
-          <button class="demo-user-button restricted" onclick="tasmacApp.quickFillLogin('789012345678')">
-            <span style="color:var(--danger);">V. Anbarasan (Account Restricted - DUI)</span>
-            <span>7890 1234 5678</span>
-          </button>
+          <div class="demo-account-title">Dummy Aadhaar database</div>
+          <p style="font-size:0.8rem; margin-bottom:0.75rem;">Choose a saved card to fill its Aadhaar number, or add a new dummy record.</p>
+          ${this.renderDummyAadhaarCards(true)}
+          <button class="btn-outline" style="width:100%; margin-top:0.75rem;" onclick="tasmacApp.openDummyAadhaarDatabase()">Add / View Dummy Aadhaar Records</button>
         </div>
       `;
     } else {
@@ -442,14 +496,14 @@ class TasmacApp {
           <div style="font-size:2rem; margin-bottom:0.5rem;">📱</div>
           <h4 style="font-size:1.1rem; font-weight:800;">Verify OTP</h4>
           <p style="font-size:0.82rem; color:var(--text-secondary);">
-            Enter the 6-digit OTP sent to mobile registered with Aadhaar <strong style="font-family:monospace;">${masked}</strong>.
+            Hello ${this.escapeText(draft.name)}. Enter the simulated OTP for demo mobile ${draft.phoneMasked}, linked to Aadhaar <strong style="font-family:monospace;">${masked}</strong>.
           </p>
         </div>
 
         <!-- Simulated Mock OTP Helper Alert -->
         <div style="background:#fef3c7; border:1px solid #fde68a; border-radius:var(--radius-md); padding:0.75rem 1rem; color:#92400e; font-size:0.82rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
-          <span>Demo OTP: <strong>543210</strong> (Simulated)</span>
-          <button class="btn-primary" style="padding:0.25rem 0.6rem; font-size:0.72rem; background:#b45309;" onclick="tasmacApp.autoFillOtp('543210')">
+          <span>Demo OTP: <strong>${draft.code}</strong> (No SMS sent)</span>
+          <button class="btn-primary" style="padding:0.25rem 0.6rem; font-size:0.72rem; background:#b45309;" onclick="tasmacApp.autoFillOtp('${draft.code}')">
             Auto-fill
           </button>
         </div>
@@ -473,7 +527,7 @@ class TasmacApp {
         </button>
 
         <div style="text-align:center; margin-top:1rem;">
-          <button style="font-size:0.8rem; color:var(--text-muted);" onclick="tasmacApp.currentLoginDraft.step='aadhaar'; tasmacApp.renderLoginModalContent();">
+          <button style="font-size:0.8rem; color:var(--text-muted);" onclick="tasmacApp.openLoginModal();">
             ← Change Aadhaar Number
           </button>
         </div>
@@ -517,41 +571,42 @@ class TasmacApp {
   }
 
   submitAadhaarForOtp() {
-    const input = document.getElementById("loginAadhaarInput");
-    const raw = input.value.replace(/\s+/g, "");
-    if (raw.length !== 12) {
-      this.showToast("Please enter a valid 12-digit Aadhaar number.", "error");
-      return;
+    const raw = document.getElementById("loginAadhaarInput").value;
+    this.issueLoginOtp(raw);
+  }
+
+  issueLoginOtp(aadhaar) {
+    try {
+      const challenge = tasmacStore.requestLoginOtp(aadhaar);
+      this.currentLoginDraft = { ...challenge, step: "otp" };
+      this.otpRemainingSec = 60;
+      this.renderLoginModalContent();
+    } catch (error) {
+      this.showToast(error.message, "error");
     }
-    this.currentLoginDraft.aadhaar = raw;
-    this.currentLoginDraft.step = "otp";
-    this.renderLoginModalContent();
-    this.showToast("Mock OTP sent to registered mobile!", "info");
   }
 
   quickFillLogin(aadhaar) {
-    this.currentLoginDraft.aadhaar = aadhaar;
-    this.currentLoginDraft.step = "otp";
-    this.renderLoginModalContent();
-    this.autoFillOtp("543210");
+    const input = document.getElementById("loginAadhaarInput");
+    input.value = aadhaar;
+    this.formatAadhaarInput(input);
+    input.focus();
   }
 
   startOtpCountdown() {
     if (this.otpTimer) clearInterval(this.otpTimer);
-    this.otpRemainingSec = 60;
-    this.otpTimer = setInterval(() => {
-      this.otpRemainingSec--;
+    const update = () => {
+      this.otpRemainingSec = Math.max(0, Math.ceil(((this.currentLoginDraft?.expiresAt || 0) - Date.now()) / 1000));
       const textEl = document.getElementById("otpTimerText");
-      if (textEl) {
-        textEl.textContent = this.otpRemainingSec > 0 ? `Resend OTP in ${this.otpRemainingSec}s` : "OTP expired. Please resend.";
-      }
-      if (this.otpRemainingSec <= 0) {
-        clearInterval(this.otpTimer);
-      }
-    }, 1000);
+      if (textEl) textEl.textContent = this.otpRemainingSec > 0 ? `OTP expires in ${this.otpRemainingSec}s` : "OTP expired. Please resend.";
+      if (!this.otpRemainingSec) clearInterval(this.otpTimer);
+    };
+    this.otpTimer = setInterval(update, 1000);
+    update();
   }
 
   handleOtpInput(index, input, event) {
+    input.value = input.value.replace(/\D/g, "").slice(0, 1);
     if (input.value.length === 1 && index < 6) {
       const next = document.getElementById(`otp-${index + 1}`);
       if (next) next.focus();
@@ -566,8 +621,7 @@ class TasmacApp {
   }
 
   resendOtp() {
-    this.showToast("Fresh OTP generated: 543210", "info");
-    this.startOtpCountdown();
+    if (this.currentLoginDraft?.step === "otp") this.issueLoginOtp(this.currentLoginDraft.aadhaar);
   }
 
   verifyOtpAndLogin() {
@@ -582,7 +636,13 @@ class TasmacApp {
       return;
     }
 
-    const user = tasmacStore.loginUser(this.currentLoginDraft.aadhaar);
+    let user;
+    try {
+      user = tasmacStore.loginUser(this.currentLoginDraft?.aadhaar || "", enteredOtp);
+    } catch (error) {
+      this.showToast(error.message, "error");
+      return;
+    }
     this.closeAllModals();
     tasmacStore.setView("home");
     this.showToast(`Welcome ${user.name}! Authenticated with masked Aadhaar.`, "success");
