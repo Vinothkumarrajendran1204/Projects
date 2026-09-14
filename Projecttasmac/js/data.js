@@ -763,6 +763,105 @@ const TASMAC_DATA = {
       },
       personaBadge: "Legally Restricted Account (DUI Recorded)",
       personaDescription: "Legally recorded Drunk Driving case under MVA Sec 185. Alcohol booking barred by government order."
+    },
+    {
+      aadhaarNumber: "234567890123", // Masked: XXXX-XXXX-0123
+      name: "K. Rahul (Minor - Age 17)",
+      age: 17,
+      dob: "2009-08-14",
+      phone: "+91 98840 77123",
+      phoneMasked: "+91 98*** **123",
+      district: "Chennai",
+      city: "Guindy",
+      isRestricted: true,
+      isUnderage: true,
+      restrictionDetails: {
+        caseNumber: "TN-AGE-2026-MIN-1704",
+        policeStation: "Social Welfare & Prohibition Enforcement Wing",
+        offenceType: "Underage Citizen Barred (Age < 18 / Sec 19 TNPA & COTPA Sec 6)",
+        bloodAlcoholLevel: "Age Verification: 17 Years (DOB: 14-Aug-2009)",
+        imposedDate: "2026-01-01",
+        reviewDate: "2027-08-14 (Age of Majority 18+)",
+        sanctionAuthority: "TN Prohibition & Social Welfare Board / UIDAI Age Registry",
+        statusNote: "Citizen is 17 years old. Under Section 19 of the Tamil Nadu Prohibition Act and Section 6 of COTPA 2003, sale of alcohol and tobacco to minors is strictly barred. Account permanently locked until 18+ verification.",
+        canAppeal: false,
+        isUnderage: true
+      },
+      weeklyQuota: {
+        alcoholUsedUnits: 0,
+        maxAlcoholUnits: 0, // Blocked
+        alcoholResetDate: "2027-08-14T00:00:00+05:30",
+        highNicotineUsed: 0,
+        lowNicotineUsed: 0,
+        maxHighNicotine: 0,
+        maxLowNicotine: 0
+      },
+      personaBadge: "Legally Barred Minor (Under 18 Age)",
+      personaDescription: "Age 17. Blocked under TN Prohibition Act Sec 19 & COTPA Sec 6. All alcohol and tobacco bookings strictly barred."
+    },
+    {
+      aadhaarNumber: "112233445566", // Masked: XXXX-XXXX-5566
+      name: "P. Karthikeyan",
+      age: 34,
+      phone: "+91 98410 99887",
+      phoneMasked: "+91 98*** **887",
+      district: "Chennai",
+      city: "T. Nagar",
+      isRestricted: true,
+      isUnderage: false,
+      restrictionDetails: {
+        caseNumber: "TN-POL-2026-CR-4512",
+        policeStation: "T. Nagar Police Station (Law & Order)",
+        offenceType: "Alcohol-Related Public Violence (IPC 323/324)",
+        bloodAlcoholLevel: "BAC 112 mg / 100 ml (Court Injunction Record)",
+        imposedDate: "2026-07-10",
+        reviewDate: "2027-01-10",
+        sanctionAuthority: "Judicial Magistrate Court & Commissioner of Police",
+        statusNote: "Court-mandated prohibition order for alcohol-fueled public affray. 6-month restraining order from TASMAC retail outlets.",
+        canAppeal: true
+      },
+      weeklyQuota: {
+        alcoholUsedUnits: 0,
+        maxAlcoholUnits: 0, // Blocked
+        alcoholResetDate: "2027-01-10T00:00:00+05:30",
+        highNicotineUsed: 0,
+        lowNicotineUsed: 0
+      },
+      personaBadge: "Court Prohibited Account (Public Affray & Violence)",
+      personaDescription: "Court-mandated prohibition order under IPC 323/324 for alcohol-fueled public disturbance. Alcohol bookings barred."
+    },
+    {
+      aadhaarNumber: "667788990011", // Masked: XXXX-XXXX-0011
+      name: "M. Saravanan",
+      age: 41,
+      phone: "+91 97890 12345",
+      phoneMasked: "+91 97*** **345",
+      district: "Chennai",
+      city: "Mylapore",
+      isRestricted: true,
+      isBlacklisted: true,
+      restrictionDetails: {
+        caseNumber: "TASMAC-VIG-2026-BLK-309",
+        policeStation: "TASMAC State Vigilance & Anti-Hoarding Squad",
+        offenceType: "Commercial Bootlegging & Black-Market Resale (TNPA Sec 4)",
+        bloodAlcoholLevel: "Seizure: 36 Quarters recovered from unauthorized commercial premise",
+        imposedDate: "2026-06-01",
+        reviewDate: "2027-06-01",
+        sanctionAuthority: "TASMAC Managing Director & Excise Enforcement Wing",
+        statusNote: "Blacklisted for systemic misuse of retail quotas for illegal bulk hoarding and resale. All portal booking privileges revoked.",
+        canAppeal: false
+      },
+      weeklyQuota: {
+        alcoholUsedUnits: 0,
+        maxAlcoholUnits: 0, // Blocked
+        alcoholResetDate: "2027-06-01T00:00:00+05:30",
+        highNicotineUsed: 0,
+        lowNicotineUsed: 0,
+        maxHighNicotine: 0,
+        maxLowNicotine: 0
+      },
+      personaBadge: "Blacklisted Citizen (Commercial Resale / Bootlegging)",
+      personaDescription: "Blacklisted by TASMAC Vigilance under TNPA Sec 4 for bulk hoarding and unauthorized resale. All purchases barred."
     }
   ],
 
@@ -911,7 +1010,7 @@ const TASMAC_DATA = {
     },
     {
       caseId: "LEG-2026-02",
-      userAadhaarMasked: "XXXX-XXXX-9901",
+      userAadhaarMasked: "XXXX-XXXX-5566",
       aadhaarNumber: "112233445566",
       citizenName: "P. Karthikeyan",
       offence: "Alcohol-Related Public Violence (IPC 323/324)",
@@ -922,6 +1021,34 @@ const TASMAC_DATA = {
       status: "Active",
       severity: "Critical",
       remarks: "Public affray under intoxication. Court mandated prohibition."
+    },
+    {
+      caseId: "LEG-2026-03",
+      userAadhaarMasked: "XXXX-XXXX-0123",
+      aadhaarNumber: "234567890123",
+      citizenName: "K. Rahul (Minor - Age 17)",
+      offence: "Underage Minor Prohibition (< 18 Years - TNPA Sec 19 & COTPA Sec 6)",
+      caseNumber: "TN-AGE-2026-MIN-1704",
+      authority: "TN Prohibition & Social Welfare Board / UIDAI Age Registry",
+      imposedDate: "2026-01-01",
+      expiryDate: "2027-08-14",
+      status: "Active",
+      severity: "High",
+      remarks: "Verified age 17. Absolute prohibition on liquor (<21) and tobacco (<18) sale under statutory law."
+    },
+    {
+      caseId: "LEG-2026-04",
+      userAadhaarMasked: "XXXX-XXXX-0011",
+      aadhaarNumber: "667788990011",
+      citizenName: "M. Saravanan",
+      offence: "Commercial Bootlegging & Unauthorized Resale (TNPA Sec 4)",
+      caseNumber: "TASMAC-VIG-2026-BLK-309",
+      authority: "TASMAC State Vigilance Squad & Excise Enforcement",
+      imposedDate: "2026-06-01",
+      expiryDate: "2027-06-01",
+      status: "Active",
+      severity: "Critical",
+      remarks: "Blacklisted for systemic illicit hoarding and commercial bootlegging outside regulated network."
     }
   ]
 };

@@ -880,13 +880,31 @@ class TasmacApp {
       statusNote: "License suspended for 90 days. Mandatory de-addiction counseling pending. All TASMAC liquor bookings barred."
     };
 
+    const isMinor = user?.isUnderage || details.isUnderage || (typeof details.offenceType === 'string' && details.offenceType.includes("Underage"));
+    const isBootleg = user?.isBlacklisted || details.isBlacklisted || (typeof details.offenceType === 'string' && details.offenceType.includes("Bootlegging"));
+
+    const modalTitle = isMinor ? "Statutory Minor Age Prohibition Notice" : isBootleg ? "Vigilance Commercial Blacklist Notice" : "Legal Case & Account Restriction Notice";
+    const alertText = isMinor ?
+      "This account is registered to an underage minor (Age 17). Under Section 19 of the Tamil Nadu Prohibition Act and Section 6 of COTPA 2003, sale of alcohol (<21) and tobacco (<18) is strictly prohibited. All token booking privileges are barred by Law." :
+      isBootleg ?
+      "This citizen identity has been blacklisted by TASMAC State Vigilance under Section 4 of the Tamil Nadu Prohibition Act for illegal hoarding and commercial bootlegging outside retail quotas." :
+      "This account is officially flagged with an active legal prohibition recorded under the Tamil Nadu Prohibition and Motor Vehicles Framework. Alcohol token booking is prohibited until authorized clearance.";
+
+    const caseNumberLabel = isMinor ? "Statutory Reference / File No" : isBootleg ? "Vigilance Case Number" : "Police Case Number";
+    const evidenceLabel = isMinor ? "Age Verification Evidence" : isBootleg ? "Vigilance Seizure Record" : "Evidence / Measured BAC";
+    const clearanceNote = isMinor ?
+      "Underage accounts are automatically reviewed for unlocking upon reaching the legal age of majority with updated biometric Aadhaar verification." :
+      isBootleg ?
+      "Commercial bootlegging blacklist orders are subject to strict administrative appeal before the TASMAC State Appellate Tribunal." :
+      "Citizens seeking clearance must present completion of RTO court proceedings to the TASMAC District Prohibition Officer.";
+
     const modalHtml = `
       <div class="modal-overlay" onclick="if(event.target === this) tasmacApp.closeAllModals()">
         <div class="modal-dialog">
           <div class="modal-header" style="background:var(--danger-light); border-bottom-color:var(--danger-border);">
             <h3 class="modal-title" style="color:var(--danger);">
               ${TasmacComponents.icons.alertTriangle}
-              <span>Legal Case & Account Restriction Notice</span>
+              <span>${modalTitle}</span>
             </h3>
             <button class="modal-close-btn" onclick="tasmacApp.closeAllModals()">✕</button>
           </div>
@@ -894,23 +912,23 @@ class TasmacApp {
           <div class="modal-body">
             <div style="background:#fef2f2; border:1px solid #fca5a5; padding:1rem; border-radius:var(--radius-md); margin-bottom:1.25rem;">
               <p style="font-size:0.85rem; color:#991b1b; line-height:1.5;">
-                This account is officially flagged with an active legal prohibition recorded under the Tamil Nadu Prohibition and Motor Vehicles Framework. Alcohol token booking is prohibited until authorized clearance.
+                ${alertText}
               </p>
             </div>
 
             <div style="display:grid; grid-template-columns:1fr; gap:0.85rem; font-size:0.85rem;">
               <div class="pass-field">
-                <span class="pass-field-label">Police Case Number</span>
+                <span class="pass-field-label">${caseNumberLabel}</span>
                 <span class="pass-field-value" style="font-family:monospace; color:var(--danger);">${details.caseNumber}</span>
               </div>
 
               <div class="pass-field">
-                <span class="pass-field-label">Offence Recorded</span>
+                <span class="pass-field-label">Offence / Legal Bar</span>
                 <span class="pass-field-value">${details.offenceType}</span>
               </div>
 
               <div class="pass-field">
-                <span class="pass-field-label">Evidence / Measured BAC</span>
+                <span class="pass-field-label">${evidenceLabel}</span>
                 <span class="pass-field-value">${details.bloodAlcoholLevel}</span>
               </div>
 
@@ -931,7 +949,7 @@ class TasmacApp {
             </div>
 
             <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--border-light); font-size:0.78rem; color:var(--text-muted);">
-              Citizens seeking clearance must present completion of RTO court proceedings to the TASMAC District Prohibition Officer.
+              ${clearanceNote}
             </div>
           </div>
         </div>
@@ -1140,15 +1158,18 @@ class TasmacApp {
             <div style="margin-bottom:1rem;">
               <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.35rem;">LEGAL OFFENCE CATEGORY</label>
               <select class="select-control" style="width:100%;" id="flagOffenceSelect">
+                <option value="Underage Minor Prohibition (< 18 Years - TNPA Sec 19 & COTPA Sec 6)">Underage Minor Prohibition (< 18 Years - TNPA Sec 19 & COTPA Sec 6)</option>
                 <option value="Drunk Driving (Sec 185 Motor Vehicles Act)">Drunk Driving (Sec 185 Motor Vehicles Act)</option>
+                <option value="Commercial Bootlegging & Unauthorized Resale (TNPA Sec 4)">Commercial Bootlegging & Unauthorized Resale (TNPA Sec 4)</option>
                 <option value="Alcohol-Related Public Violence (IPC 323/324)">Alcohol-Related Public Violence (IPC 323/324)</option>
                 <option value="Narcotics / NDPS Co-Violation">Narcotics / NDPS Co-Violation</option>
                 <option value="Court Order Prohibition Sanction">Court Order Prohibition Sanction</option>
+                <option value="Medical De-addiction Rehabilitation Directive">Medical De-addiction Rehabilitation Directive</option>
               </select>
             </div>
 
             <div style="margin-bottom:1rem;">
-              <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.35rem;">POLICE CASE NUMBER</label>
+              <label style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.35rem;">CASE / STATUTORY REFERENCE NUMBER</label>
               <input type="text" id="flagCaseNum" value="TN-POL-2026-DUI-9912" class="select-control" style="width:100%;">
             </div>
 
@@ -1158,7 +1179,7 @@ class TasmacApp {
             </div>
 
             <button class="btn-primary" style="width:100%; justify-content:center; background:var(--danger);" onclick="tasmacApp.confirmFlagUser()">
-              Confirm Restriction & Block Alcohol Booking
+              Confirm Restriction & Enforce Booking Block
             </button>
           </div>
         </div>
@@ -1174,16 +1195,21 @@ class TasmacApp {
     const caseNum = document.getElementById("flagCaseNum").value;
     const reviewDate = document.getElementById("flagReviewDate").value;
 
+    const isUnderage = offence.includes("Underage");
+    const isBootlegging = offence.includes("Bootlegging");
+
     tasmacStore.toggleUserRestriction(aadhaar, true, {
       caseNumber: caseNum,
-      policeStation: "Prohibition & Enforcement Wing, Chennai",
+      policeStation: isUnderage ? "Social Welfare & Prohibition Enforcement Wing" : isBootlegging ? "TASMAC State Vigilance Squad" : "Prohibition & Enforcement Wing, Chennai",
       offenceType: offence,
-      bloodAlcoholLevel: "94 mg / 100 ml",
+      bloodAlcoholLevel: isUnderage ? "Age Verification: Minor Identity (<18)" : isBootlegging ? "Seizure: Illicit bulk stock impounded" : "94 mg / 100 ml",
       imposedDate: new Date().toISOString().split("T")[0],
       reviewDate: reviewDate,
-      sanctionAuthority: "Traffic Police & Judicial Magistrate",
-      statusNote: "Prohibition order enforced by District Prohibition Officer.",
-      canAppeal: true
+      sanctionAuthority: isUnderage ? "TN Social Welfare Board & UIDAI" : isBootlegging ? "TASMAC MD & Excise Wing" : "Traffic Police & Judicial Magistrate",
+      statusNote: isUnderage ? "Sale of alcohol (<21) and tobacco (<18) strictly prohibited by Law." : isBootlegging ? "Commercial bootlegging blacklist enforced under TNPA Sec 4." : "Prohibition order enforced by District Prohibition Officer.",
+      canAppeal: !isUnderage && !isBootlegging,
+      isUnderage: isUnderage,
+      isBlacklisted: isBootlegging
     });
 
     this.closeAllModals();

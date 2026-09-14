@@ -48,12 +48,45 @@ class TasmacStore {
       legalRestrictions: initial?.legalRestrictions || JSON.parse(JSON.stringify(data.legalRestrictions || []))
     };
 
-    if (localStorage.getItem(this.AADHAAR_DB_KEY) === null) {
-      localStorage.setItem(this.AADHAAR_DB_KEY, JSON.stringify((data.demoUsers || []).map(user => ({
-        aadhaarNumber: user.aadhaarNumber, name: user.name,
-        mobile: user.phone.replace(/\D/g, "").slice(-10), district: user.district, city: user.city
-      }))));
+    // Reconcile and merge all demo personas into state.users
+    (data.demoUsers || []).forEach(demoUser => {
+      const idx = this.state.users.findIndex(u => u.aadhaarNumber === demoUser.aadhaarNumber);
+      if (idx === -1) {
+        this.state.users.push(JSON.parse(JSON.stringify(demoUser)));
+      } else {
+        if (demoUser.isRestricted && !this.state.users[idx].isRestricted) {
+          this.state.users[idx].isRestricted = true;
+          this.state.users[idx].restrictionDetails = JSON.parse(JSON.stringify(demoUser.restrictionDetails));
+        }
+        this.state.users[idx].personaBadge = demoUser.personaBadge;
+        this.state.users[idx].personaDescription = demoUser.personaDescription;
+        if (demoUser.isUnderage) this.state.users[idx].isUnderage = true;
+        if (demoUser.isBlacklisted) this.state.users[idx].isBlacklisted = true;
+        if (demoUser.age) this.state.users[idx].age = demoUser.age;
+        if (demoUser.dob) this.state.users[idx].dob = demoUser.dob;
+      }
+    });
+
+    // Reconcile legal restrictions
+    (data.legalRestrictions || []).forEach(leg => {
+      if (!this.state.legalRestrictions.some(r => r.caseId === leg.caseId)) {
+        this.state.legalRestrictions.push(JSON.parse(JSON.stringify(leg)));
+      }
+    });
+
+    // Reconcile dummy Aadhaar database records
+    const existingAadhaar = this.getDummyAadhaarRecords();
+    const missingAadhaar = (data.demoUsers || []).filter(u => !existingAadhaar.some(r => r.aadhaarNumber === u.aadhaarNumber)).map(u => ({
+      aadhaarNumber: u.aadhaarNumber,
+      name: u.name,
+      mobile: u.phone.replace(/\D/g, "").slice(-10),
+      district: u.district,
+      city: u.city
+    }));
+    if (existingAadhaar.length === 0 || missingAadhaar.length > 0) {
+      localStorage.setItem(this.AADHAAR_DB_KEY, JSON.stringify([...existingAadhaar, ...missingAadhaar]));
     }
+
     // Seed dummy records immediately and preserve only sessions from this login flow.
     this.state.currentUser = initial?.authVersion === 2
       ? this.state.users.find(user => user.aadhaarNumber === initial.currentUser?.aadhaarNumber) || null
@@ -236,6 +269,8 @@ class TasmacStore {
     if (!user) {
       return {
         isRestricted: false,
+        isUnderage: false,
+        isBlacklisted: false,
         alcohol: { max: 1.0, used: 0, remaining: 1.0, percent: 0, isReached: false, resetDate: "2026-09-14T00:00:00+05:30" },
         cigarettes: {
           hasAlcoholUsed: false,
@@ -254,6 +289,9 @@ class TasmacStore {
     };
 
     const isRestricted = !!user.isRestricted;
+    const isUnderage = isRestricted && (!!user.isUnderage || (user.age !== undefined && user.age < 18) || !!user.restrictionDetails?.isUnderage || (typeof user.restrictionDetails?.offenceType === 'string' && user.restrictionDetails.offenceType.includes("Underage")));
+    const isBlacklisted = isRestricted && (!!user.isBlacklisted || !!user.restrictionDetails?.isBlacklisted || (typeof user.restrictionDetails?.offenceType === 'string' && user.restrictionDetails.offenceType.includes("Bootlegging")));
+
     const maxAlcohol = isRestricted ? 0 : 1.0;
     const alcoholUsed = isRestricted ? 0 : quota.alcoholUsedUnits;
     const alcoholRemaining = isRestricted ? 0 : Math.max(0, Math.round((maxAlcohol - alcoholUsed) * 10) / 10);
@@ -261,23 +299,27 @@ class TasmacStore {
     const isAlcoholReached = isRestricted || alcoholRemaining <= 0;
 
     // Cigarette Quota Rules:
+    // If citizen is Underage or Blacklisted: Cigarette limits are strictly 0/0!
     // If user has NOT used alcohol (used === 0): High: 5, Low: 10
     // If user HAS used alcohol (used > 0): High: 3, Low: 6
     const hasAlcoholUsed = alcoholUsed > 0;
-    const maxHigh = hasAlcoholUsed ? 3 : 5;
-    const maxLow = hasAlcoholUsed ? 6 : 10;
+    let maxHigh = (isUnderage || isBlacklisted) ? 0 : (hasAlcoholUsed ? 3 : 5);
+    let maxLow = (isUnderage || isBlacklisted) ? 0 : (hasAlcoholUsed ? 6 : 10);
 
-    const highUsed = Math.min(maxHigh, quota.highNicotineUsed || 0);
-    const lowUsed = Math.min(maxLow, quota.lowNicotineUsed || 0);
+    const highUsed = Math.min(maxHigh, (isUnderage || isBlacklisted) ? 0 : (quota.highNicotineUsed || 0));
+    const lowUsed = Math.min(maxLow, (isUnderage || isBlacklisted) ? 0 : (quota.lowNicotineUsed || 0));
 
     const highRemaining = Math.max(0, maxHigh - highUsed);
     const lowRemaining = Math.max(0, maxLow - lowUsed);
 
-    const highPercent = Math.min(100, Math.round((highUsed / maxHigh) * 100));
-    const lowPercent = Math.min(100, Math.round((lowUsed / maxLow) * 100));
+    const highPercent = maxHigh > 0 ? Math.min(100, Math.round((highUsed / maxHigh) * 100)) : 100;
+    const lowPercent = maxLow > 0 ? Math.min(100, Math.round((lowUsed / maxLow) * 100)) : 100;
 
     return {
       isRestricted,
+      isUnderage,
+      isBlacklisted,
+      restrictionType: isUnderage ? 'underage' : isBlacklisted ? 'bootlegging' : user.restrictionDetails?.offenceType?.includes("Violence") ? 'violence' : 'dui',
       restrictionDetails: user.restrictionDetails,
       alcohol: {
         max: maxAlcohol,
@@ -294,14 +336,14 @@ class TasmacStore {
           used: highUsed,
           remaining: highRemaining,
           percent: highPercent,
-          isReached: highRemaining <= 0
+          isReached: (isUnderage || isBlacklisted || highRemaining <= 0)
         },
         low: {
           max: maxLow,
           used: lowUsed,
           remaining: lowRemaining,
           percent: lowPercent,
-          isReached: lowRemaining <= 0
+          isReached: (isUnderage || isBlacklisted || lowRemaining <= 0)
         }
       }
     };
@@ -310,17 +352,33 @@ class TasmacStore {
   // Can user book this product?
   canBookProduct(productId, quantity = 1, user = this.state.currentUser) {
     if (!user) return { allowed: false, reason: "Please log in to book products." };
-    if (user.isRestricted) {
-      return { 
-        allowed: false, 
-        reason: "Account Restricted: Legal case recorded under Motor Vehicles Act / IPC. Alcohol booking is suspended by order." 
-      };
-    }
 
     const product = this.state.products.find(p => p.id === productId);
     if (!product) return { allowed: false, reason: "Product not found." };
 
     const limits = this.getUserLimits(user);
+
+    if (user.isRestricted) {
+      if (limits.isUnderage) {
+        return { 
+          allowed: false, 
+          reason: "Account Blocked (Under 18 Minor): Citizen is 17 years old. Sale of alcohol (<21) and tobacco (<18) is strictly prohibited by Tamil Nadu Prohibition Act (Sec 19) and COTPA 2003 (Sec 6)." 
+        };
+      }
+      if (limits.isBlacklisted) {
+        return { 
+          allowed: false, 
+          reason: "Account Barred (Blacklist): Blacklisted by TASMAC State Vigilance under TNPA Sec 4 for commercial bootlegging and unauthorized resale." 
+        };
+      }
+      // For DUI or Public Violence: alcohol is barred
+      if (product.category === "Hard Liquor" || product.category === "Beer" || product.category === "Wine") {
+        return { 
+          allowed: false, 
+          reason: user.restrictionDetails?.statusNote || "Account Restricted: Legal prohibition recorded. Alcohol booking is suspended by Government Order." 
+        };
+      }
+    }
 
     if (product.category === "Hard Liquor") {
       if (limits.alcohol.isReached) {
@@ -543,6 +601,9 @@ class TasmacStore {
         statusNote: "License suspended. Mandatory alcohol counseling pending.",
         canAppeal: true
       };
+      user.isUnderage = !!(user.restrictionDetails.isUnderage || user.restrictionDetails.offenceType?.includes("Underage"));
+      user.isBlacklisted = !!(user.restrictionDetails.isBlacklisted || user.restrictionDetails.offenceType?.includes("Bootlegging"));
+
       // Record in legal restrictions log
       const existing = this.state.legalRestrictions.find(r => r.aadhaarNumber === aadhaarNumber);
       if (!existing) {
@@ -560,9 +621,15 @@ class TasmacStore {
           severity: "High",
           remarks: user.restrictionDetails.statusNote
         });
+      } else {
+        existing.status = "Active";
+        existing.offence = user.restrictionDetails.offenceType;
+        existing.caseNumber = user.restrictionDetails.caseNumber;
       }
     } else {
       user.restrictionDetails = null;
+      user.isUnderage = false;
+      user.isBlacklisted = false;
       // Mark resolved in legal restrictions log
       const rec = this.state.legalRestrictions.find(r => r.aadhaarNumber === aadhaarNumber);
       if (rec) {

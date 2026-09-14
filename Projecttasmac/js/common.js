@@ -473,6 +473,92 @@ const UAL_DB = {
         date: "2026-09-10"
       },
       personaNote: "Restricted Account: Drink-and-drive case. Booking completely disabled."
+    },
+    {
+      aadhaarNumber: "234567890123",
+      customerId: "TN-DEMO-0123",
+      name: "K. Rahul (Minor - Age 17)",
+      age: 17,
+      isUnderage: true,
+      phone: "+91 98840 77123",
+      phoneMasked: "******0123",
+      district: "Chennai",
+      city: "Guindy",
+      isRestricted: true,
+      restrictionStatus: "Temporarily Restricted",
+      restrictionCase: {
+        category: "Underage Minor Prohibition (< 18 Years)",
+        caseRef: "UAL-CASE-AGE-1704",
+        authority: "TN Social Welfare Board & Prohibition Dept",
+        imposedDate: "2026-01-01",
+        status: "Temporarily Restricted",
+        notice: "Statutory Restriction: Sale of alcohol to persons under 18/21 is strictly prohibited under TN Prohibition Act Sec 19."
+      },
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 0,
+        nonHotUsed: 0,
+        nonHotMax: 0,
+        date: "2026-09-10"
+      },
+      personaNote: "Underage Minor (Age 17): Prohibited under TN Prohibition Act Sec 19. All bookings locked."
+    },
+    {
+      aadhaarNumber: "112233445566",
+      customerId: "TN-DEMO-5566",
+      name: "P. Karthikeyan",
+      age: 34,
+      phone: "+91 98410 99887",
+      phoneMasked: "******5566",
+      district: "Chennai",
+      city: "T. Nagar",
+      isRestricted: true,
+      restrictionStatus: "Temporarily Restricted",
+      restrictionCase: {
+        category: "Court Order Injunction (Public Affray IPC 323/324)",
+        caseRef: "UAL-CASE-CR-4512",
+        authority: "Judicial Magistrate Court & City Police",
+        imposedDate: "2026-07-10",
+        status: "Temporarily Restricted",
+        notice: "Court Mandated Injunction: TASMAC retail outlet restraining order."
+      },
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 0,
+        nonHotUsed: 0,
+        nonHotMax: 0,
+        date: "2026-09-10"
+      },
+      personaNote: "Court Injunction: Alcohol-related public disturbance (IPC 323/324). Booking barred."
+    },
+    {
+      aadhaarNumber: "667788990011",
+      customerId: "TN-DEMO-0011",
+      name: "M. Saravanan",
+      age: 41,
+      isBlacklisted: true,
+      phone: "+91 97890 12345",
+      phoneMasked: "******0011",
+      district: "Chennai",
+      city: "Mylapore",
+      isRestricted: true,
+      restrictionStatus: "Temporarily Restricted",
+      restrictionCase: {
+        category: "Commercial Bootlegging Blacklist (TNPA Sec 4)",
+        caseRef: "UAL-CASE-BLK-309",
+        authority: "TASMAC State Vigilance Squad",
+        imposedDate: "2026-06-01",
+        status: "Temporarily Restricted",
+        notice: "Vigilance Blacklist: Systemic illegal hoarding & resale under TNPA Sec 4."
+      },
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 0,
+        nonHotUsed: 0,
+        nonHotMax: 0,
+        date: "2026-09-10"
+      },
+      personaNote: "Vigilance Blacklist: Commercial bootlegging under TNPA Sec 4. Indefinitely revoked."
     }
   ],
 
@@ -573,6 +659,22 @@ class UalStore {
       customers: initial?.customers || JSON.parse(JSON.stringify(UAL_DB.demoCustomers)),
       bookings: initial?.bookings || JSON.parse(JSON.stringify(UAL_DB.initialBookings))
     };
+
+    // Reconcile and merge demo customers
+    (UAL_DB.demoCustomers || []).forEach(dc => {
+      const idx = this.state.customers.findIndex(c => c.aadhaarNumber === dc.aadhaarNumber);
+      if (idx === -1) {
+        this.state.customers.push(JSON.parse(JSON.stringify(dc)));
+      } else {
+        this.state.customers[idx].personaNote = dc.personaNote;
+        if (dc.isRestricted) {
+          this.state.customers[idx].isRestricted = true;
+          this.state.customers[idx].restrictionCase = dc.restrictionCase;
+        }
+        if (dc.isUnderage) this.state.customers[idx].isUnderage = true;
+        if (dc.isBlacklisted) this.state.customers[idx].isBlacklisted = true;
+      }
+    });
 
     // Default to first demo customer if not logged in
     if (!this.state.currentUser && !this.state.isAdmin) {
@@ -1053,7 +1155,7 @@ const UalUI = {
                       <div class="flex items-center gap-2">
                         <strong>${c.name}</strong>
                         <span class="badge ${c.isRestricted ? 'badge-danger' : limits.hot.isReached ? 'badge-warning' : 'badge-success'}">
-                          ${c.isRestricted ? 'Restricted' : limits.hot.isReached ? 'Limit Reached' : 'Clean'}
+                          ${c.isRestricted ? (c.isUnderage ? 'Minor (<18)' : c.isBlacklisted ? 'Blacklisted' : 'Restricted') : limits.hot.isReached ? 'Limit Reached' : 'Clean'}
                         </span>
                         <span class="mono-text">${c.customerId}</span>
                       </div>

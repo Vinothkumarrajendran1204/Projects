@@ -150,17 +150,28 @@ const TasmacComponents = {
     if (!user || !user.isRestricted) return '';
 
     const details = user.restrictionDetails || {};
+    const isMinor = user.isUnderage || details.isUnderage || (typeof details.offenceType === 'string' && details.offenceType.includes("Underage"));
+    const isBlacklist = user.isBlacklisted || details.isBlacklisted || (typeof details.offenceType === 'string' && details.offenceType.includes("Bootlegging"));
+
     return `
       <div class="restriction-banner">
         <div class="container">
           <div class="restriction-left">
             <span style="font-size:1.2rem;">⚠️</span>
             <span>
-              <strong>ACCOUNT RESTRICTED:</strong> Legal restriction recorded (${details.offenceType || 'DUI / Public Order'}). Alcohol token booking is strictly blocked by Government Mandate.
+              ${isMinor ? `
+                <strong>ACCOUNT BLOCKED (UNDER 18 MINOR):</strong> Age 17. Sale of alcohol (<21) and tobacco (<18) is strictly prohibited by Tamil Nadu Prohibition Act Sec 19 & COTPA Sec 6.
+              ` : isBlacklist ? `
+                <strong>ACCOUNT SUSPENDED (VIGILANCE BLACKLIST):</strong> Commercial bootlegging & illicit hoarding recorded under TNPA Sec 4. All booking access revoked.
+              ` : `
+                <strong>ACCOUNT RESTRICTED:</strong> Legal restriction recorded (${details.offenceType || 'DUI / Public Order'}). Alcohol token booking is strictly blocked by Government Mandate.
+              `}
             </span>
           </div>
           <div>
-            <button class="btn-view-case" onclick="tasmacApp.openLegalCaseModal()">View Legal Case & Review Info</button>
+            <button class="btn-view-case" onclick="tasmacApp.openLegalCaseModal()">
+              ${isMinor ? 'View Age Verification & Legal Info' : 'View Legal Case & Review Info'}
+            </button>
           </div>
         </div>
       </div>
@@ -291,7 +302,21 @@ const TasmacComponents = {
     const resetStr = resetDateObj.toLocaleDateString("en-IN", { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
     let alcoholWarningHtml = '';
-    if (limits.isRestricted) {
+    if (limits.isUnderage) {
+      alcoholWarningHtml = `
+        <div class="limit-warning-box">
+          ${this.icons.alertTriangle}
+          <span>Minor Barred (<18): Sale of liquor strictly barred under TN Prohibition Act Sec 19.</span>
+        </div>
+      `;
+    } else if (limits.isBlacklisted) {
+      alcoholWarningHtml = `
+        <div class="limit-warning-box">
+          ${this.icons.alertTriangle}
+          <span>Vigilance Blacklist: Commercial bootlegging sanction under TNPA Sec 4.</span>
+        </div>
+      `;
+    } else if (limits.isRestricted) {
       alcoholWarningHtml = `
         <div class="limit-warning-box">
           ${this.icons.alertTriangle}
@@ -342,7 +367,10 @@ const TasmacComponents = {
               <span>🚬 Cigarette Weekly Quota</span>
             </div>
             <div class="meter-values" style="font-size:0.75rem;">
-              ${cig.hasAlcoholUsed ? `<span style="color:#b45309; font-weight:700;">Reduced Tier (Alcohol Consumed)</span>` : `<span style="color:#15803d; font-weight:700;">Standard Tier (No Alcohol)</span>`}
+              ${limits.isUnderage ? `<span style="color:var(--danger); font-weight:700;">Barred (Under 18 - COTPA Sec 6)</span>` :
+                limits.isBlacklisted ? `<span style="color:var(--danger); font-weight:700;">Barred (Vigilance Blacklist)</span>` :
+                cig.hasAlcoholUsed ? `<span style="color:#b45309; font-weight:700;">Reduced Tier (Alcohol Consumed)</span>` : 
+                `<span style="color:#15803d; font-weight:700;">Standard Tier (No Alcohol)</span>`}
             </div>
           </div>
 
@@ -368,9 +396,21 @@ const TasmacComponents = {
             </div>
           </div>
 
-          <div class="meter-subtext-detail" style="margin-top:0.6rem;">
-            <span>Rule: High max ${cig.high.max} / Low max ${cig.low.max} packs based on alcohol status</span>
-          </div>
+          ${limits.isUnderage ? `
+            <div class="limit-warning-box" style="margin-top:0.75rem;">
+              ${this.icons.alertTriangle}
+              <span>Underage Minor: Cigarette & tobacco purchase prohibited by Law.</span>
+            </div>
+          ` : limits.isBlacklisted ? `
+            <div class="limit-warning-box" style="margin-top:0.75rem;">
+              ${this.icons.alertTriangle}
+              <span>Commercial Bootlegging: All purchases revoked under TNPA Sec 4.</span>
+            </div>
+          ` : `
+            <div class="meter-subtext-detail" style="margin-top:0.6rem;">
+              <span>Rule: High max ${cig.high.max} / Low max ${cig.low.max} packs based on alcohol status</span>
+            </div>
+          `}
         </div>
       </div>
     `;
@@ -790,12 +830,37 @@ const TasmacComponents = {
     // Limit indicator chip
     let limitChipHtml = '';
     if (userLimits.isRestricted) {
-      limitChipHtml = `
-        <div class="user-limit-chip blocked">
-          <span>Account Restricted</span>
-          <span>Alcohol Barred</span>
-        </div>
-      `;
+      if (userLimits.isUnderage) {
+        limitChipHtml = `
+          <div class="user-limit-chip blocked">
+            <span>Minor Barred (<18)</span>
+            <span>All Sales Prohibited</span>
+          </div>
+        `;
+      } else if (userLimits.isBlacklisted) {
+        limitChipHtml = `
+          <div class="user-limit-chip blocked">
+            <span>Vigilance Blacklist</span>
+            <span>Commercial Bar</span>
+          </div>
+        `;
+      } else if (product.category === "Cigarettes") {
+        const isHigh = product.nicotineType === "high";
+        const cigLimits = isHigh ? userLimits.cigarettes.high : userLimits.cigarettes.low;
+        limitChipHtml = `
+          <div class="user-limit-chip ${cigLimits.isReached ? 'blocked' : ''}">
+            <span>${isHigh ? 'High' : 'Low'} Nicotine Quota</span>
+            <span>${cigLimits.remaining} of ${cigLimits.max} packs left</span>
+          </div>
+        `;
+      } else {
+        limitChipHtml = `
+          <div class="user-limit-chip blocked">
+            <span>Account Restricted</span>
+            <span>Alcohol Barred</span>
+          </div>
+        `;
+      }
     } else if (product.category === "Hard Liquor" || product.category === "Beer" || product.category === "Wine") {
       if (userLimits.alcohol.isReached) {
         limitChipHtml = `
@@ -859,7 +924,7 @@ const TasmacComponents = {
             onclick="tasmacApp.openBookingModal('${shop.id}', '${product.id}')"
             title="${!canBook.allowed ? canBook.reason : stock <= 0 ? 'Out of Stock' : !shop.isOpen ? 'Shop is currently closed' : 'Book Now'}">
             ${this.icons.calendar}
-            <span>${stock <= 0 ? 'Out of Stock' : !canBook.allowed ? 'Limit Reached' : 'Book Now'}</span>
+            <span>${stock <= 0 ? 'Out of Stock' : !canBook.allowed ? (userLimits.isUnderage ? 'Minor Barred (<18)' : userLimits.isBlacklisted ? 'Blacklisted' : userLimits.isRestricted ? 'Account Blocked' : 'Limit Reached') : 'Book Now'}</span>
           </button>
         </div>
       </div>
@@ -915,6 +980,30 @@ const TasmacComponents = {
                   <li><strong>If Alcohol HAS Been Used:</strong> High Nicotine dynamically restricted to max 3 packs/wk • Low Nicotine to 6 packs/wk.</li>
                   <li>Promotes public health and prevents co-addiction escalation.</li>
                 </ul>
+              </div>
+
+              <div style="background:var(--bg-muted); padding:1.25rem; border-radius:var(--radius-md); grid-column:1 / -1;">
+                <h4 style="font-size:0.95rem; font-weight:800; color:var(--danger); margin-bottom:0.5rem;">
+                  3. Statutory Restrictions & Prohibitions (Section 7)
+                </h4>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; font-size:0.83rem; color:var(--text-secondary); line-height:1.5;">
+                  <div>
+                    <strong style="color:var(--text-primary); display:block;">🔞 Under 18 Minor Prohibition</strong>
+                    Strictly barred from alcohol (<21) and tobacco (<18) under TNPA Sec 19 and COTPA Sec 6. Quota: 0/0.
+                  </div>
+                  <div>
+                    <strong style="color:var(--text-primary); display:block;">🚗 Drunk Driving (DUI)</strong>
+                    Conviction under MVA Sec 185 bars alcohol purchases for 90 days pending mandatory counseling.
+                  </div>
+                  <div>
+                    <strong style="color:var(--text-primary); display:block;">⚖️ Court Restraining Orders</strong>
+                    Judicial orders for alcohol-fueled public violence under IPC 323/324 bar liquor token reservations.
+                  </div>
+                  <div>
+                    <strong style="color:var(--text-primary); display:block;">🚫 Vigilance Blacklisting</strong>
+                    Commercial hoarding and illegal unauthorized resale under TNPA Sec 4 indefinitely revokes portal access.
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1175,7 +1264,7 @@ const TasmacComponents = {
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.5rem;">
           <div>
             <h3 style="font-size:1.15rem; font-weight:800;">Account Restriction Management (Legal / Police Database)</h3>
-            <p style="font-size:0.82rem; color:var(--text-muted);">Enforcing prohibitions under Motor Vehicles Act Sec 185 (Drunk Driving) and IPC 323/324.</p>
+            <p style="font-size:0.82rem; color:var(--text-muted);">Enforcing statutory bans under TN Prohibition Act Sec 19 (Underage Minor), COTPA Sec 6, Motor Vehicles Act Sec 185 (DUI), and IPC 323/324.</p>
           </div>
           <button class="btn-primary" style="background:var(--danger);" onclick="tasmacApp.openFlagUserModal()">
             + Restrict Citizen Account
@@ -1333,7 +1422,12 @@ const TasmacComponents = {
                     </td>
                     <td>
                       ${u.isRestricted ? `
-                        <span class="status-badge cancelled">Restricted (DUI)</span>
+                        <span class="status-badge cancelled">${
+                          limits.isUnderage ? 'Restricted (Under 18)' :
+                          limits.isBlacklisted ? 'Blacklisted (Vigilance)' :
+                          (u.restrictionDetails?.offenceType && u.restrictionDetails.offenceType.includes('Violence')) ? 'Restricted (Court Order)' :
+                          'Restricted (DUI)'
+                        }</span>
                       ` : `
                         <span class="status-badge collected">Clean</span>
                       `}
