@@ -1248,6 +1248,15 @@ img {
   transform: scale(1.04);
 }
 
+.product-image-container.product-image-cigarette {
+  background: #fdf2f2;
+}
+
+.product-image-container.product-image-cigarette img {
+  object-fit: contain;
+  padding: 0.35rem 0;
+}
+
 .product-badge-cat {
   position: absolute;
   top: 0.75rem;

@@ -889,8 +889,8 @@ const TasmacComponents = {
     }
 
     return `
-      <div class="product-card">
-        <div class="product-image-container">
+      <div class="product-card" data-category="${product.category}">
+        <div class="product-image-container ${product.category === 'Cigarettes' ? 'product-image-cigarette' : ''}">
           <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=600&auto=format&fit=crop&q=80'">
           <span class="product-badge-cat">${product.category}</span>
           <span class="${stockTagClass}">${stockLabel}</span>

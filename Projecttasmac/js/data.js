@@ -598,7 +598,7 @@ const TASMAC_DATA = {
       abv: "Nicotine: 1.1mg | Tar: 12mg",
       price: 380,
       description: "Full-flavoured premium blend with toasted Virginia tobaccos.",
-      image: "https://images.unsplash.com/photo-1527061011665-3652c757a4d4?w=600&auto=format&fit=crop&q=80",
+      image: "images/products/classic-regular.jpg",
       nicotineType: "high"
     },
     {
@@ -612,7 +612,7 @@ const TASMAC_DATA = {
       abv: "Nicotine: 1.0mg | Tar: 11mg",
       price: 380,
       description: "Iconic golden Virginia leaf blend with smooth rich draw.",
-      image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&auto=format&fit=crop&q=80",
+      image: "images/products/gold-flake-kings.jpg",
       nicotineType: "high"
     },
     {
@@ -626,7 +626,7 @@ const TASMAC_DATA = {
       abv: "Nicotine: 1.2mg | Tar: 13mg",
       price: 410,
       description: "Bold American tobacco blend with distinctive red chevron pack.",
-      image: "https://images.unsplash.com/photo-1527061011665-3652c757a4d4?w=600&auto=format&fit=crop&q=80",
+      image: "images/products/marlboro-red.jpg",
       nicotineType: "high"
     },
     {
@@ -640,7 +640,7 @@ const TASMAC_DATA = {
       abv: "Nicotine: 0.6mg | Tar: 6mg",
       price: 380,
       description: "Charcoal active-filtered blend crafted for mellow smoothness.",
-      image: "https://images.unsplash.com/photo-1527061011665-3652c757a4d4?w=600&auto=format&fit=crop&q=80",
+      image: "images/products/classic-milds.jpg",
       nicotineType: "low"
     },
     {
@@ -654,7 +654,7 @@ const TASMAC_DATA = {
       abv: "Nicotine: 0.5mg | Tar: 5mg",
       price: 380,
       description: "Light balanced cigarette with micro-perforated ventilation tips.",
-      image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&auto=format&fit=crop&q=80",
+      image: "images/products/gold-flake-lights.jpg",
       nicotineType: "low"
     },
     {
@@ -668,7 +668,7 @@ const TASMAC_DATA = {
       abv: "Nicotine: 0.6mg | Tar: 6mg",
       price: 410,
       description: "Crisp refined taste featuring lower tar and reduced nicotine content.",
-      image: "https://images.unsplash.com/photo-1527061011665-3652c757a4d4?w=600&auto=format&fit=crop&q=80",
+      image: "images/products/marlboro-gold.jpg",
       nicotineType: "low"
     }
   ],

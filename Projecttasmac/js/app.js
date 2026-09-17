@@ -736,7 +736,7 @@ class TasmacApp {
           <div class="modal-body">
             <!-- Product Snapshot -->
             <div style="display:flex; gap:1rem; align-items:center; background:var(--bg-muted); padding:1rem; border-radius:var(--radius-md); margin-bottom:1.25rem;">
-              <img src="${product.image}" style="width:60px; height:60px; object-fit:cover; border-radius:var(--radius-sm);">
+              <img src="${product.image}" style="width:60px; height:60px; object-fit:${product.category === 'Cigarettes' ? 'contain' : 'cover'}; background:${product.category === 'Cigarettes' ? '#fdf2f2' : 'transparent'}; border-radius:var(--radius-sm);">
               <div>
                 <div style="font-size:0.75rem; font-weight:700; color:var(--accent-gold);">${product.brand} • ${product.category}</div>
                 <div style="font-weight:800; font-size:0.95rem;">${product.name}</div>

@@ -74,6 +74,18 @@ class TasmacStore {
       }
     });
 
+    // Reconcile product images and data from window.TASMAC_DATA
+    if (data.products && this.state.products) {
+      data.products.forEach(dp => {
+        const prod = this.state.products.find(p => p.id === dp.id);
+        if (prod) {
+          prod.image = dp.image;
+        } else {
+          this.state.products.push(JSON.parse(JSON.stringify(dp)));
+        }
+      });
+    }
+
     // Reconcile dummy Aadhaar database records
     const existingAadhaar = this.getDummyAadhaarRecords();
     const missingAadhaar = (data.demoUsers || []).filter(u => !existingAadhaar.some(r => r.aadhaarNumber === u.aadhaarNumber)).map(u => ({
