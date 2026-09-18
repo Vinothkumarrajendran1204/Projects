@@ -28,11 +28,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const custIdElem = document.getElementById("dashCustId");
   const custPhoneElem = document.getElementById("dashCustPhone");
   const custLocationElem = document.getElementById("dashCustLocation");
+  const custAadhaarElem = document.getElementById("dashCustAadhaar");
+  const custDobElem = document.getElementById("dashCustDob");
 
   if (custNameElem) custNameElem.textContent = user.name;
   if (custIdElem) custIdElem.textContent = user.customerId;
-  if (custPhoneElem) custPhoneElem.textContent = user.phoneMasked;
+  if (custPhoneElem) custPhoneElem.textContent = user.phoneMasked || ("******" + (user.aadhaarNumber || "1234").slice(-4));
   if (custLocationElem) custLocationElem.textContent = `${user.district || "Chennai"} District, TN`;
+  if (custAadhaarElem) custAadhaarElem.textContent = user.aadhaarFormatted ? `Aadhaar: ${user.aadhaarFormatted}` : `Aadhaar: XXXX-XXXX-${(user.aadhaarNumber || "1234").slice(-4)}`;
+  if (custDobElem) custDobElem.textContent = user.dob || "1990-05-14";
 
   // Render Daily Limit Meters & Status
   renderLimitMeters(user);
@@ -182,6 +186,22 @@ function renderLimitMeters(user) {
               Your NON-HOT daily limit has been reached. You can book again tomorrow.
             </div>
           ` : ''}
+        </div>
+      </div>
+
+      <!-- Monday to Sunday Weekly Cycle Information Banner -->
+      <div style="margin-top:1.25rem; padding:0.85rem 1rem; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span style="font-size:1.3rem;">🔄</span>
+          <div style="font-size:0.8rem; color:#0f5a34;">
+            <strong>Weekly Reset Cycle: Monday to Sunday</strong>
+            <div style="font-size:0.75rem; color:#166534; margin-top:2px;">
+              Limits automatically reset after Sunday 11:59 PM (Monday 00:00 AM). <strong>All past booking & token history is permanently saved.</strong>
+            </div>
+          </div>
+        </div>
+        <div>
+          <span class="badge badge-success" style="font-size:0.72rem; padding:0.35rem 0.65rem;">History Preserved</span>
         </div>
       </div>
     </div>

@@ -70,37 +70,58 @@
             </div>
 
             <div class="flex flex-col gap-2">
-              <button class="persona-row" onclick="fillPersona('2345 6789 0123')">
+              <button type="button" class="persona-row" onclick="fillPersona('4567 8901 2345')">
                 <div>
-                  <strong>S. Murugan (Clean Account)</strong>
-                  <div style="font-size:0.75rem; color:var(--text-secondary);">🔥 HOT: 0/1 | 🍺 NON-HOT: 0/2 (Eligible)</div>
+                  <strong>Rajesh Kannan (Clean Citizen)</strong>
+                  <div style="font-size:0.75rem; color:var(--text-secondary);">🔥 HOT: 0/1 | 🍺 NON-HOT: 0/2 • 100% Eligible</div>
                 </div>
-                <span class="badge badge-success">0/1 Used</span>
+                <span class="badge badge-success">Full Quota</span>
               </button>
 
-              <button class="persona-row" onclick="fillPersona('3456 7890 1234')">
+              <button type="button" class="persona-row" onclick="fillPersona('3456 7890 1234')">
                 <div>
-                  <strong>K. Anand (HOT Reached)</strong>
-                  <div style="font-size:0.75rem; color:var(--text-secondary);">🔥 HOT: 1/1 (Reached) | 🍺 NON-HOT: 1/2</div>
+                  <strong>S. Murugan (Active Citizen)</strong>
+                  <div style="font-size:0.75rem; color:var(--text-secondary);">🔥 HOT: 0/1 | 🍺 NON-HOT: 1/2 used • Partial Available</div>
                 </div>
-                <span class="badge badge-warning">HOT Reached</span>
+                <span class="badge badge-warning">Partial Used</span>
               </button>
 
-              <button class="persona-row" onclick="fillPersona('4567 8901 2345')">
+              <button type="button" class="persona-row" onclick="fillPersona('9012 3456 7890')">
                 <div>
-                  <strong>M. Vijay (All Limits Exhausted)</strong>
-                  <div style="font-size:0.75rem; color:var(--text-secondary);">🔥 HOT: 1/1 | 🍺 NON-HOT: 2/2 (Booking Locked)</div>
+                  <strong>M. Vijay (Quota Exhausted)</strong>
+                  <div style="font-size:0.75rem; color:var(--text-secondary);">🔥 HOT: 1/1 | 🍺 NON-HOT: 2/2 used • Bookings Locked</div>
                 </div>
                 <span class="badge badge-danger">Exhausted</span>
               </button>
 
-              <button class="persona-row restricted" onclick="fillPersona('9999 8888 7777')">
+              <button type="button" class="persona-row restricted" onclick="fillPersona('7890 1234 5678')">
                 <div>
-                  <strong style="color:#dc2626;">R. Karthik (Restricted)</strong>
-                  <div style="font-size:0.75rem; color:#dc2626;">Drink-and-drive violation notice (Booking Disabled)</div>
+                  <strong style="color:#dc2626;">V. Anbarasan (DUI Recorded)</strong>
+                  <div style="font-size:0.75rem; color:#dc2626;">Drunk driving case (Sec 185 MVA) • License Suspended</div>
                 </div>
-                <span class="badge badge-danger">Restricted</span>
+                <span class="badge badge-danger">DUI Barred</span>
               </button>
+
+              <button type="button" class="persona-row restricted" onclick="fillPersona('2345 6789 0123')">
+                <div>
+                  <strong style="color:#dc2626;">K. Rahul (Underage Minor - Age 17)</strong>
+                  <div style="font-size:0.75rem; color:#dc2626;">Age &lt; 18 barred under TNPA Sec 19 & COTPA Sec 6</div>
+                </div>
+                <span class="badge badge-danger">Minor (&lt;18)</span>
+              </button>
+
+              <button type="button" class="persona-row restricted" onclick="fillPersona('6677 8899 0011')">
+                <div>
+                  <strong style="color:#dc2626;">M. Saravanan (Bootlegging Blacklist)</strong>
+                  <div style="font-size:0.75rem; color:#dc2626;">Commercial bootlegging & hoarding (TNPA Sec 4)</div>
+                </div>
+                <span class="badge badge-danger">Blacklisted</span>
+              </button>
+            </div>
+
+            <!-- Weekly Cycle Reset & History Notice -->
+            <div style="margin-top:0.9rem; padding:0.6rem 0.8rem; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; font-size:0.74rem; color:#0f5a34; line-height:1.4;">
+              🔄 <strong>Weekly Quota Reset:</strong> Monday to Sunday cycle. Limits auto-reset after Sunday midnight (Monday 00:00 AM). <strong>All past token & purchase history is permanently retained.</strong>
             </div>
           </div>
 

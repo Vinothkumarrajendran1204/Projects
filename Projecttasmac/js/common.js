@@ -388,77 +388,136 @@ const UAL_DB = {
     }
   ],
 
-  // Mock Customers with Daily Limit tracking
+  // Mock Customers with full Aadhaar card identity & daily limit tracking details
   demoCustomers: [
     {
-      aadhaarNumber: "456789012345", // Masked: XXXX-XXXX-2345
+      aadhaarNumber: "456789012345",
+      aadhaarFormatted: "4567 8901 2345",
+      aadhaarMasked: "XXXX-XXXX-2345",
       customerId: "TN-DEMO-2345",
       name: "Rajesh Kannan",
+      nameTamil: "ராஜேஷ் கண்ணன்",
+      gender: "Male",
+      dob: "1990-05-14",
+      age: 34,
+      careOf: "S/O K. Ramanathan",
       phone: "+91 98401 23456",
       phoneMasked: "******2345",
+      address: "Door No. 42, 2nd Avenue, Block AB, Anna Nagar West, Chennai - 600040",
       district: "Chennai",
       city: "Anna Nagar",
+      pincode: "600040",
+      enrolmentNo: "2026/00142/08912",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2016-04-12",
+      photo: "👤",
+      qrData: "UIDAI:456789012345|NAME:Rajesh Kannan|DOB:1990-05-14|GEN:M|ADDR:Chennai-600040",
       isRestricted: false,
       restrictionStatus: "Cleared",
+      restrictionCase: null,
       dailyLimits: {
         hotUsed: 0,
         hotMax: 1,
         nonHotUsed: 0,
         nonHotMax: 2,
-        date: "2026-09-10"
+        date: "2026-09-18"
       },
       personaNote: "Clean Customer: HOT 0/1, NON-HOT 0/2. All bookings available."
     },
     {
       aadhaarNumber: "345678901234",
+      aadhaarFormatted: "3456 7890 1234",
+      aadhaarMasked: "XXXX-XXXX-1234",
       customerId: "TN-DEMO-1234",
       name: "S. Murugan",
+      nameTamil: "எஸ். முருகன்",
+      gender: "Male",
+      dob: "1985-11-22",
+      age: 38,
+      careOf: "S/O M. Subramanian",
       phone: "+91 94440 98765",
       phoneMasked: "******1234",
+      address: "Door No. 18, South Usman Road, T. Nagar, Chennai - 600017",
       district: "Chennai",
       city: "T. Nagar",
+      pincode: "600017",
+      enrolmentNo: "2026/00142/07541",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2015-08-19",
+      photo: "👤",
+      qrData: "UIDAI:345678901234|NAME:S. Murugan|DOB:1985-11-22|GEN:M|ADDR:Chennai-600017",
       isRestricted: false,
       restrictionStatus: "Cleared",
+      restrictionCase: null,
       dailyLimits: {
         hotUsed: 0,
         hotMax: 1,
         nonHotUsed: 1,
         nonHotMax: 2,
-        date: "2026-09-10"
+        date: "2026-09-18"
       },
       personaNote: "Active Customer: NON-HOT 1/2 used. Can only book 1 additional NON-HOT unit."
     },
     {
       aadhaarNumber: "901234567890",
+      aadhaarFormatted: "9012 3456 7890",
+      aadhaarMasked: "XXXX-XXXX-7890",
       customerId: "TN-DEMO-7890",
       name: "M. Vijay",
+      nameTamil: "எம். விஜய்",
+      gender: "Male",
+      dob: "1992-03-08",
+      age: 32,
+      careOf: "S/O P. Manickam",
       phone: "+91 97910 44321",
       phoneMasked: "******7890",
+      address: "Plot No. 105, 100 Feet Bypass Road, Velachery, Chennai - 600042",
       district: "Chennai",
       city: "Velachery",
+      pincode: "600042",
+      enrolmentNo: "2026/00142/09124",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2017-02-11",
+      photo: "👤",
+      qrData: "UIDAI:901234567890|NAME:M. Vijay|DOB:1992-03-08|GEN:M|ADDR:Chennai-600042",
       isRestricted: false,
       restrictionStatus: "Cleared",
+      restrictionCase: null,
       dailyLimits: {
         hotUsed: 1,
         hotMax: 1,
         nonHotUsed: 2,
         nonHotMax: 2,
-        date: "2026-09-10"
+        date: "2026-09-18"
       },
       personaNote: "Limit Reached: HOT 1/1, NON-HOT 2/2. All bookings locked for today."
     },
     {
       aadhaarNumber: "789012345678",
+      aadhaarFormatted: "7890 1234 5678",
+      aadhaarMasked: "XXXX-XXXX-5678",
       customerId: "TN-DEMO-5678",
       name: "V. Anbarasan",
+      nameTamil: "வி. அன்பரசன்",
+      gender: "Male",
+      dob: "1987-09-19",
+      age: 37,
+      careOf: "S/O T. Veluchamy",
       phone: "+91 99402 11987",
       phoneMasked: "******5678",
+      address: "Flat 3B, Shanti Colony, 4th Main Road, Anna Nagar, Chennai - 600040",
       district: "Chennai",
       city: "Anna Nagar",
+      pincode: "600040",
+      enrolmentNo: "2026/00142/04481",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2015-10-04",
+      photo: "👤",
+      qrData: "UIDAI:789012345678|NAME:V. Anbarasan|DOB:1987-09-19|GEN:M|ADDR:Chennai-600040",
       isRestricted: true,
-      restrictionStatus: "Temporarily Restricted",
+      restrictionStatus: "Temporarily Restricted (DUI)",
       restrictionCase: {
-        category: "Drink-and-drive related restriction",
+        category: "Drink-and-drive related restriction (Sec 185 MVA)",
         caseRef: "UAL-CASE-DUI-882",
         authority: "Traffic Investigation Wing & RTO",
         imposedDate: "2026-08-15",
@@ -470,22 +529,35 @@ const UAL_DB = {
         hotMax: 0,
         nonHotUsed: 0,
         nonHotMax: 0,
-        date: "2026-09-10"
+        date: "2026-09-18"
       },
       personaNote: "Restricted Account: Drink-and-drive case. Booking completely disabled."
     },
     {
       aadhaarNumber: "234567890123",
+      aadhaarFormatted: "2345 6789 0123",
+      aadhaarMasked: "XXXX-XXXX-0123",
       customerId: "TN-DEMO-0123",
       name: "K. Rahul (Minor - Age 17)",
+      nameTamil: "கே. ராகுல் (சிறார் - 17 வயது)",
+      gender: "Male",
       age: 17,
+      dob: "2009-08-14",
+      careOf: "S/O R. Krishnan",
       isUnderage: true,
       phone: "+91 98840 77123",
       phoneMasked: "******0123",
+      address: "No. 15, Race Course Road, Guindy, Chennai - 600032",
       district: "Chennai",
       city: "Guindy",
+      pincode: "600032",
+      enrolmentNo: "2026/00142/02901",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2018-09-15",
+      photo: "👤",
+      qrData: "UIDAI:234567890123|NAME:K. Rahul|DOB:2009-08-14|GEN:M|ADDR:Chennai-600032",
       isRestricted: true,
-      restrictionStatus: "Temporarily Restricted",
+      restrictionStatus: "Underage Minor Barred (<18)",
       restrictionCase: {
         category: "Underage Minor Prohibition (< 18 Years)",
         caseRef: "UAL-CASE-AGE-1704",
@@ -499,21 +571,34 @@ const UAL_DB = {
         hotMax: 0,
         nonHotUsed: 0,
         nonHotMax: 0,
-        date: "2026-09-10"
+        date: "2026-09-18"
       },
       personaNote: "Underage Minor (Age 17): Prohibited under TN Prohibition Act Sec 19. All bookings locked."
     },
     {
       aadhaarNumber: "112233445566",
+      aadhaarFormatted: "1122 3344 5566",
+      aadhaarMasked: "XXXX-XXXX-5566",
       customerId: "TN-DEMO-5566",
       name: "P. Karthikeyan",
+      nameTamil: "பி. கார்த்திகேயன்",
+      gender: "Male",
       age: 34,
+      dob: "1990-01-25",
+      careOf: "S/O S. Perumal",
       phone: "+91 98410 99887",
       phoneMasked: "******5566",
+      address: "Door No. 8, Ranganathan Street, T. Nagar, Chennai - 600017",
       district: "Chennai",
       city: "T. Nagar",
+      pincode: "600017",
+      enrolmentNo: "2026/00142/06633",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2016-12-05",
+      photo: "👤",
+      qrData: "UIDAI:112233445566|NAME:P. Karthikeyan|DOB:1990-01-25|GEN:M|ADDR:Chennai-600017",
       isRestricted: true,
-      restrictionStatus: "Temporarily Restricted",
+      restrictionStatus: "Court Injunction (IPC 323/324)",
       restrictionCase: {
         category: "Court Order Injunction (Public Affray IPC 323/324)",
         caseRef: "UAL-CASE-CR-4512",
@@ -527,22 +612,35 @@ const UAL_DB = {
         hotMax: 0,
         nonHotUsed: 0,
         nonHotMax: 0,
-        date: "2026-09-10"
+        date: "2026-09-18"
       },
       personaNote: "Court Injunction: Alcohol-related public disturbance (IPC 323/324). Booking barred."
     },
     {
       aadhaarNumber: "667788990011",
+      aadhaarFormatted: "6677 8899 0011",
+      aadhaarMasked: "XXXX-XXXX-0011",
       customerId: "TN-DEMO-0011",
       name: "M. Saravanan",
+      nameTamil: "எம். சரவணன்",
+      gender: "Male",
       age: 41,
+      dob: "1983-06-12",
+      careOf: "S/O D. Muthu",
       isBlacklisted: true,
       phone: "+91 97890 12345",
       phoneMasked: "******0011",
+      address: "Old No. 71, Kutchery Road, Mylapore, Chennai - 600004",
       district: "Chennai",
       city: "Mylapore",
+      pincode: "600004",
+      enrolmentNo: "2026/00142/01198",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2014-03-27",
+      photo: "👤",
+      qrData: "UIDAI:667788990011|NAME:M. Saravanan|DOB:1983-06-12|GEN:M|ADDR:Chennai-600004",
       isRestricted: true,
-      restrictionStatus: "Temporarily Restricted",
+      restrictionStatus: "Vigilance Blacklist (Bootlegging)",
       restrictionCase: {
         category: "Commercial Bootlegging Blacklist (TNPA Sec 4)",
         caseRef: "UAL-CASE-BLK-309",
@@ -556,9 +654,118 @@ const UAL_DB = {
         hotMax: 0,
         nonHotUsed: 0,
         nonHotMax: 0,
-        date: "2026-09-10"
+        date: "2026-09-18"
       },
       personaNote: "Vigilance Blacklist: Commercial bootlegging under TNPA Sec 4. Indefinitely revoked."
+    },
+    {
+      aadhaarNumber: "999988887777",
+      aadhaarFormatted: "9999 8888 7777",
+      aadhaarMasked: "XXXX-XXXX-7777",
+      customerId: "TN-DEMO-7777",
+      name: "R. Karthik",
+      nameTamil: "ஆர். கார்த்திக்",
+      gender: "Male",
+      age: 30,
+      dob: "1994-10-04",
+      careOf: "S/O G. Rajendran",
+      phone: "+91 98405 67890",
+      phoneMasked: "******890",
+      address: "Door No. 12, 1st Main Road, Besant Nagar, Adyar, Chennai - 600090",
+      district: "Chennai",
+      city: "Adyar",
+      pincode: "600090",
+      enrolmentNo: "2026/00142/05562",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2016-07-22",
+      photo: "👤",
+      qrData: "UIDAI:999988887777|NAME:R. Karthik|DOB:1994-10-04|GEN:M|ADDR:Chennai-600090",
+      isRestricted: true,
+      restrictionStatus: "Temporarily Restricted (DUI Citation)",
+      restrictionCase: {
+        category: "Drink-and-drive violation notice (Sec 185 MVA)",
+        caseRef: "UAL-CASE-DUI-9988",
+        authority: "Adyar Traffic Police (TIW-South)",
+        imposedDate: "2026-08-20",
+        status: "Temporarily Restricted",
+        notice: "Drink-and-drive violation notice. Retail quota booking suspended pending review."
+      },
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 0,
+        nonHotUsed: 0,
+        nonHotMax: 0,
+        date: "2026-09-18"
+      },
+      personaNote: "Restricted Account: Drink-and-drive notice (Sec 185 MVA). Bookings disabled."
+    },
+    {
+      aadhaarNumber: "554433221100",
+      aadhaarFormatted: "5544 3322 1100",
+      aadhaarMasked: "XXXX-XXXX-1100",
+      customerId: "TN-DEMO-1100",
+      name: "Smt. Priya Sundaram",
+      nameTamil: "திருமதி. பிரியா சுந்தரம்",
+      gender: "Female",
+      age: 33,
+      dob: "1991-04-18",
+      careOf: "W/O R. Sundaram",
+      phone: "+91 98403 45678",
+      phoneMasked: "******678",
+      address: "Plot No. 28, Gandhi Nagar 1st Cross, Adyar, Chennai - 600020",
+      district: "Chennai",
+      city: "Adyar",
+      pincode: "600020",
+      enrolmentNo: "2026/00142/03389",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2015-11-30",
+      photo: "👤",
+      qrData: "UIDAI:554433221100|NAME:Priya Sundaram|DOB:1991-04-18|GEN:F|ADDR:Chennai-600020",
+      isRestricted: false,
+      restrictionStatus: "Cleared",
+      restrictionCase: null,
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 1,
+        nonHotUsed: 0,
+        nonHotMax: 2,
+        date: "2026-09-18"
+      },
+      personaNote: "Clean Customer: Wine & Beer Quota Active. Full booking availability."
+    },
+    {
+      aadhaarNumber: "887766554433",
+      aadhaarFormatted: "8877 6655 4433",
+      aadhaarMasked: "XXXX-XXXX-4433",
+      customerId: "TN-DEMO-4433",
+      name: "A. Mohammed Farooq",
+      nameTamil: "ஏ. முகமது பாரூக்",
+      gender: "Male",
+      age: 35,
+      dob: "1989-12-05",
+      careOf: "S/O K. Abdul Rahman",
+      phone: "+91 94432 11223",
+      phoneMasked: "******223",
+      address: "Door No. 56, Cross Cut Road, Gandhipuram, Coimbatore - 641012",
+      district: "Coimbatore",
+      city: "Gandhipuram",
+      pincode: "641012",
+      enrolmentNo: "2026/00142/08871",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2017-06-18",
+      photo: "👤",
+      qrData: "UIDAI:887766554433|NAME:A. Mohammed Farooq|DOB:1989-12-05|GEN:M|ADDR:Coimbatore-641012",
+      isRestricted: false,
+      restrictionStatus: "Cleared",
+      restrictionCase: null,
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 1,
+        nonHotUsed: 0,
+        nonHotMax: 2,
+        date: "2026-09-18"
+      },
+      personaNote: "Clean Customer: Coimbatore District Resident. All bookings available."
     }
   ],
 
@@ -656,9 +863,14 @@ class UalStore {
       
       shops: initial?.shops || JSON.parse(JSON.stringify(UAL_DB.shops)),
       products: initial?.products || JSON.parse(JSON.stringify(UAL_DB.products)),
-      customers: initial?.customers || JSON.parse(JSON.stringify(UAL_DB.demoCustomers)),
+      customers: initial?.customers?.length ? initial.customers : JSON.parse(JSON.stringify(UAL_DB.demoCustomers)),
       bookings: initial?.bookings || JSON.parse(JSON.stringify(UAL_DB.initialBookings))
     };
+
+    // Ensure customers is never empty when data was deleted
+    if (!this.state.customers || this.state.customers.length === 0) {
+      this.state.customers = JSON.parse(JSON.stringify(UAL_DB.demoCustomers));
+    }
 
     // Reconcile and merge demo customers
     (UAL_DB.demoCustomers || []).forEach(dc => {
@@ -666,6 +878,21 @@ class UalStore {
       if (idx === -1) {
         this.state.customers.push(JSON.parse(JSON.stringify(dc)));
       } else {
+        Object.assign(this.state.customers[idx], {
+          careOf: dc.careOf,
+          dob: dc.dob,
+          age: dc.age,
+          gender: dc.gender,
+          address: dc.address,
+          pincode: dc.pincode,
+          enrolmentNo: dc.enrolmentNo,
+          cardType: dc.cardType,
+          photo: dc.photo,
+          qrData: dc.qrData,
+          nameTamil: dc.nameTamil,
+          aadhaarFormatted: dc.aadhaarFormatted,
+          aadhaarMasked: dc.aadhaarMasked
+        });
         this.state.customers[idx].personaNote = dc.personaNote;
         if (dc.isRestricted) {
           this.state.customers[idx].isRestricted = true;
@@ -716,15 +943,80 @@ class UalStore {
     });
   }
 
+  // --- Monday-to-Sunday Weekly Cycle Engine ---
+  // Calculates next Monday 00:00:00 AM (after Sunday ends)
+  getNextMondayReset(refDate = new Date()) {
+    const d = new Date(refDate);
+    const day = d.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const daysUntilNextMonday = day === 0 ? 1 : (8 - day);
+    d.setDate(d.getDate() + daysUntilNextMonday);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  getCurrentWeeklyCycle(refDate = new Date()) {
+    const now = new Date(refDate);
+    const day = now.getDay();
+    const daysSinceMonday = day === 0 ? 6 : (day - 1);
+    const cycleStart = new Date(now);
+    cycleStart.setDate(cycleStart.getDate() - daysSinceMonday);
+    cycleStart.setHours(0, 0, 0, 0);
+
+    const cycleEnd = new Date(cycleStart);
+    cycleEnd.setDate(cycleEnd.getDate() + 6);
+    cycleEnd.setHours(23, 59, 59, 999);
+
+    const nextReset = this.getNextMondayReset(now);
+
+    return {
+      cycleStart,
+      cycleEnd,
+      nextReset,
+      cycleLabel: "Monday to Sunday",
+      resetDescription: "Automatic limit reset after Sunday 11:59 PM (Monday 00:00 AM)"
+    };
+  }
+
+  checkAndResetWeeklyLimits(user) {
+    if (!user) return;
+    const now = new Date();
+    const resetDate = new Date(user.dailyLimits?.resetDate || user.weeklyQuota?.alcoholResetDate || 0);
+
+    // If reset time passed (Monday arrived after Sunday)
+    if (isNaN(resetDate.getTime()) || now >= resetDate) {
+      const nextMonday = this.getNextMondayReset(now);
+      if (user.dailyLimits) {
+        user.dailyLimits.hotUsed = 0;
+        user.dailyLimits.nonHotUsed = 0;
+        user.dailyLimits.resetDate = nextMonday.toISOString();
+        user.dailyLimits.date = now.toISOString().split("T")[0];
+      }
+      if (user.weeklyQuota) {
+        user.weeklyQuota.alcoholUsedUnits = 0;
+        user.weeklyQuota.highNicotineUsed = 0;
+        user.weeklyQuota.lowNicotineUsed = 0;
+        user.weeklyQuota.alcoholResetDate = nextMonday.toISOString();
+      }
+      // CRITICAL: Booking & token history (this.state.bookings) is NEVER wiped or modified on weekly reset!
+      this.save();
+    }
+  }
+
   // --- Daily Limits Engine ---
   getDailyLimits(user = this.state.currentUser) {
+    const cycle = this.getCurrentWeeklyCycle();
+
     if (!user) {
       return {
         isRestricted: false,
+        cycleInfo: cycle,
         hot: { used: 0, max: 1, remaining: 1, isReached: false, percent: 0 },
         nonHot: { used: 0, max: 2, remaining: 2, isReached: false, percent: 0 }
       };
     }
+
+    // Auto-check and apply Monday-to-Sunday weekly reset
+    this.checkAndResetWeeklyLimits(user);
 
     const limits = user.dailyLimits || { hotUsed: 0, hotMax: 1, nonHotUsed: 0, nonHotMax: 2 };
     const isRestricted = !!user.isRestricted;
@@ -1202,6 +1494,138 @@ const UalUI = {
     if (modal) modal.innerHTML = "";
     UalUI.toast("Logged in as Administrator", "success");
     window.location.href = "admin.html";
+  },
+
+  // View Official UIDAI Dummy Aadhaar Card Modal
+  openAadhaarCardModal(aadhaarNumber) {
+    const targetAadhaar = aadhaarNumber || window.ualStore.state.currentUser?.aadhaarNumber;
+    const clean = String(targetAadhaar || "").replace(/\s+/g, "");
+    const customer = window.ualStore.state.customers.find(c => c.aadhaarNumber.replace(/\s+/g, "") === clean) || window.ualStore.state.currentUser;
+    if (!customer) return;
+
+    let modal = document.getElementById("aadhaarCardModal");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "aadhaarCardModal";
+      document.body.appendChild(modal);
+    }
+
+    const formattedAadhaar = customer.aadhaarFormatted || customer.aadhaarNumber.replace(/(\d{4})(?=\d)/g, "$1 ");
+    const dob = customer.dob || "1990-05-14";
+    const gender = customer.gender || "Male";
+    const careOf = customer.careOf || "S/O K. Ramanathan";
+    const address = customer.address || `${customer.city}, ${customer.district} - ${customer.pincode || "600040"}`;
+    const nameTamil = customer.nameTamil || "";
+
+    modal.innerHTML = `
+      <div class="modal-overlay" onclick="if(event.target === this) this.remove()">
+        <div class="modal-dialog" style="max-width:540px; padding:0; overflow:hidden; border-radius:18px; border:2px solid #cbd5e1; box-shadow:var(--shadow-xl);">
+          
+          <!-- UIDAI Official Card Header -->
+          <div style="background:linear-gradient(135deg, #ea580c 0%, #ffffff 50%, #16a34a 100%); padding:4px 0;"></div>
+          <div style="background:#ffffff; padding:1.2rem 1.5rem 0.8rem; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <div style="font-size:1.8rem; line-height:1;">🏛️</div>
+              <div>
+                <div style="font-size:0.7rem; font-weight:800; color:#b45309; text-transform:uppercase; letter-spacing:0.05em;">இந்திய தனித்துவ அடையாள ஆணையம்</div>
+                <div style="font-size:0.85rem; font-weight:900; color:#0f172a;">Unique Identification Authority of India</div>
+                <div style="font-size:0.68rem; color:#64748b;">Government of India • Demo Simulation Card</div>
+              </div>
+            </div>
+            <button class="modal-close-btn" style="position:static; padding:0.25rem 0.6rem;" onclick="this.closest('.modal-overlay').remove()">✕</button>
+          </div>
+
+          <!-- Card Body -->
+          <div style="background:#ffffff; padding:1.5rem; position:relative;">
+            <!-- Watermark -->
+            <div style="position:absolute; right:15%; top:25%; opacity:0.04; font-size:9rem; pointer-events:none; font-weight:900;">UIDAI</div>
+
+            <div style="display:grid; grid-template-columns:110px 1fr; gap:1.25rem; align-items:start;">
+              <!-- Photo Frame -->
+              <div style="text-align:center;">
+                <div style="width:105px; height:125px; border:2px solid #cbd5e1; border-radius:8px; background:#f1f5f9; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; box-shadow:inset 0 2px 4px rgba(0,0,0,0.05);">
+                  <span style="font-size:3.2rem;">${customer.photo || "👤"}</span>
+                  <span style="font-size:0.6rem; color:#64748b; font-weight:700; margin-top:2px;">MOCK CITIZEN</span>
+                </div>
+                <div style="font-size:0.65rem; color:#64748b; margin-top:0.4rem; font-family:monospace;">
+                  ${customer.customerId || "TN-DEMO"}
+                </div>
+              </div>
+
+              <!-- Citizen Details -->
+              <div>
+                <div style="margin-bottom:0.75rem;">
+                  <div style="font-size:1.2rem; font-weight:900; color:#0f172a;">${customer.name}</div>
+                  ${nameTamil ? `<div style="font-size:0.85rem; font-weight:700; color:#0f5a34;">${nameTamil}</div>` : ''}
+                </div>
+
+                <div style="font-size:0.82rem; color:#334155; line-height:1.6;">
+                  <div><strong style="color:#64748b;">DOB:</strong> <span style="font-weight:700;">${dob}</span> (Age: ${customer.age || 34})</div>
+                  <div><strong style="color:#64748b;">Gender:</strong> <span style="font-weight:700;">${gender}</span></div>
+                  <div><strong style="color:#64748b;">C/O:</strong> <span>${careOf}</span></div>
+                  <div><strong style="color:#64748b;">Mobile:</strong> <span style="font-family:monospace; font-weight:700;">${customer.phone || ("+91 " + customer.phoneMasked)}</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Address Block -->
+            <div style="margin-top:1.2rem; padding:0.75rem 1rem; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0; font-size:0.8rem; color:#334155;">
+              <strong style="color:#64748b; display:block; font-size:0.72rem; text-transform:uppercase; margin-bottom:0.2rem;">Residential Address</strong>
+              <div>${address}</div>
+            </div>
+
+            <!-- Aadhaar Number Large Banner -->
+            <div style="margin-top:1.25rem; text-align:center; padding:0.75rem; background:#fef3c7; border:1.5px solid #fde68a; border-radius:10px;">
+              <div style="font-size:0.7rem; color:#92400e; font-weight:800; letter-spacing:0.08em; text-transform:uppercase;">ஆதார் எண் / Aadhaar Number</div>
+              <div style="font-size:1.5rem; font-weight:900; color:#0f172a; font-family:monospace; letter-spacing:0.18em; margin-top:0.2rem;">
+                ${formattedAadhaar}
+              </div>
+              <div style="font-size:0.72rem; color:#b45309; margin-top:0.2rem; font-weight:700;">
+                ஆதார் - சாதாரண மனிதனின் உரிமை
+              </div>
+            </div>
+
+            <!-- Footer Meta with QR and Verification -->
+            <div style="margin-top:1.25rem; display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:1rem;">
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <div id="aadhaarQrBox" style="width:64px; height:64px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; display:flex; align-items:center; justify-content:center;"></div>
+                <div style="font-size:0.72rem; color:#64748b;">
+                  <div>Secure QR Verified</div>
+                  <strong style="color:#0f5a34;">UIDAI Mock Database</strong>
+                </div>
+              </div>
+
+              <div style="text-align:right;">
+                <span class="badge ${customer.isRestricted ? 'badge-danger' : 'badge-success'}" style="font-size:0.78rem;">
+                  ${customer.isRestricted ? (customer.restrictionStatus || 'Temporarily Restricted') : 'Verified Citizen Profile'}
+                </span>
+                <div style="font-size:0.7rem; color:#64748b; margin-top:0.25rem;">Quota Engine: Active</div>
+              </div>
+            </div>
+
+            <div style="margin-top:1rem; display:flex; gap:0.5rem; justify-content:flex-end;">
+              <button class="btn-outline" onclick="window.print()" style="font-size:0.8rem; padding:0.4rem 0.85rem;">🖨️ Print Card</button>
+              <button class="btn-primary" onclick="this.closest('.modal-overlay').remove()" style="font-size:0.8rem; padding:0.4rem 0.85rem;">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    setTimeout(() => {
+      const qrTarget = document.getElementById("aadhaarQrBox");
+      if (qrTarget && window.QRCode) {
+        qrTarget.innerHTML = "";
+        new QRCode(qrTarget, {
+          text: customer.qrData || `UIDAI:${customer.aadhaarNumber}|NAME:${customer.name}`,
+          width: 60,
+          height: 60,
+          colorDark: "#0f5a34",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
+    }, 50);
   }
 };
 

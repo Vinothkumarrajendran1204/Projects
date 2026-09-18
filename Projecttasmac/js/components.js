@@ -931,6 +931,98 @@ const TasmacComponents = {
     `;
   },
 
+  // 12b. Official UIDAI Aadhaar Card Snippet Renderer
+  renderAadhaarCardSnippet(user) {
+    if (!user) {
+      return `
+        <div style="background:white; border-radius:var(--radius-lg); border:1px dashed var(--border-medium); padding:2rem; text-align:center; margin-bottom:1.5rem;">
+          <div style="font-size:2.2rem; margin-bottom:0.5rem;">🪪</div>
+          <h3 style="font-size:1.1rem; font-weight:800; color:var(--text-primary); margin-bottom:0.25rem;">Citizen Aadhaar Not Verified</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary); max-width:400px; margin:0 auto 1rem;">Log in using your 12-digit mock Aadhaar or select a test persona to view your identity card and limits.</p>
+          <button class="btn-primary" onclick="tasmacApp.openLoginModal()">Citizen Login →</button>
+        </div>
+      `;
+    }
+
+    const formattedAadhaar = user.aadhaarFormatted || (user.aadhaarNumber || "").replace(/(\d{4})(?=\d)/g, "$1 ");
+    const dob = user.dob || "1990-05-14";
+    const gender = user.gender || "Male";
+    const careOf = user.careOf || "S/O K. Ramanathan";
+    const address = user.address || `${user.city || "Anna Nagar"}, ${user.district || "Chennai"} - ${user.pincode || "600040"}`;
+    const nameTamil = user.nameTamil || "";
+
+    return `
+      <div style="background:white; border-radius:16px; border:1.5px solid #cbd5e1; margin-bottom:1.75rem; overflow:hidden; box-shadow:var(--shadow-sm);">
+        <!-- Tricolor Indian Ribbon -->
+        <div style="background:linear-gradient(90deg, #ea580c 0%, #ffffff 50%, #16a34a 100%); height:5px;"></div>
+
+        <!-- Header -->
+        <div style="padding:1rem 1.5rem; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <div style="font-size:1.8rem; line-height:1;">🏛️</div>
+            <div>
+              <div style="font-size:0.68rem; font-weight:800; color:#b45309; text-transform:uppercase;">இந்திய தனித்துவ அடையாள ஆணையம்</div>
+              <div style="font-size:0.85rem; font-weight:900; color:#0f172a;">Unique Identification Authority of India (UIDAI)</div>
+              <div style="font-size:0.7rem; color:#64748b;">Government of India • Verified Resident Identity Card</div>
+            </div>
+          </div>
+          <div>
+            <span class="badge ${user.isRestricted ? 'badge-danger' : 'badge-success'}" style="font-size:0.78rem;">
+              ${user.isRestricted ? 'Account Barred' : 'Active Resident'}
+            </span>
+          </div>
+        </div>
+
+        <!-- Main Card Body -->
+        <div style="padding:1.5rem; display:grid; grid-template-columns:110px 1fr; gap:1.5rem; align-items:start;" class="aadhaar-grid">
+          <!-- Photo Frame -->
+          <div style="text-align:center;">
+            <div style="width:105px; height:125px; border:2px solid #cbd5e1; border-radius:8px; background:#f1f5f9; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden;">
+              <span style="font-size:3.2rem;">${user.photo || "👤"}</span>
+              <span style="font-size:0.58rem; color:#64748b; font-weight:800;">MOCK CITIZEN</span>
+            </div>
+            <div style="font-size:0.65rem; color:#64748b; margin-top:0.35rem; font-family:monospace;">
+              ${user.customerId || "TN-DEMO"}
+            </div>
+          </div>
+
+          <!-- Details -->
+          <div>
+            <div style="margin-bottom:0.6rem;">
+              <h3 style="font-size:1.25rem; font-weight:900; color:#0f172a; margin:0;">${user.name}</h3>
+              ${nameTamil ? `<div style="font-size:0.85rem; font-weight:700; color:#0f5a34;">${nameTamil}</div>` : ''}
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:0.4rem; font-size:0.82rem; color:#334155; line-height:1.5;">
+              <div><span style="color:#64748b; font-weight:600;">DOB:</span> <strong>${dob}</strong> (Age: ${user.age || 34})</div>
+              <div><span style="color:#64748b; font-weight:600;">Gender:</span> <strong>${gender}</strong></div>
+              <div style="grid-column:1 / -1;"><span style="color:#64748b; font-weight:600;">Care of:</span> <span>${careOf}</span></div>
+              <div style="grid-column:1 / -1;"><span style="color:#64748b; font-weight:600;">Linked Mobile:</span> <span style="font-family:monospace; font-weight:700;">${user.phone || ("+91 " + user.phoneMasked)}</span></div>
+              <div style="grid-column:1 / -1; margin-top:0.2rem; padding:0.5rem 0.75rem; background:#f8fafc; border-radius:6px; border:1px solid #e2e8f0; font-size:0.78rem;">
+                <span style="color:#64748b; font-weight:700; display:block; text-transform:uppercase; font-size:0.68rem;">Residential Address:</span>
+                ${address}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aadhaar Number Footer -->
+        <div style="background:#fef3c7; border-top:1.5px solid #fde68a; padding:0.75rem 1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+          <div>
+            <div style="font-size:0.65rem; color:#92400e; font-weight:800; letter-spacing:0.08em; text-transform:uppercase;">ஆதார் எண் / Aadhaar Number</div>
+            <div style="font-size:1.35rem; font-weight:900; color:#0f172a; font-family:monospace; letter-spacing:0.18em;">
+              ${formattedAadhaar}
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.72rem; color:#b45309; font-weight:700;">ஆதார் - சாதாரண மனிதனின் உரிமை</div>
+            <div style="font-size:0.68rem; color:#78350f;">Aadhaar - Right of the Common Man</div>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
   // 13. My Limits View (Section 5 & 6)
   renderMyLimitsView(state) {
     const user = state.currentUser;
@@ -946,6 +1038,22 @@ const TasmacComponents = {
               <p class="section-subtitle">Official state quota tracking linked to verified citizen identity.</p>
             </div>
             <button class="btn-outline" onclick="tasmacApp.openPersonaModal()">Switch Test Citizen</button>
+          </div>
+
+          <!-- Monday to Sunday Weekly Cycle Information Banner -->
+          <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius-md); padding:1rem 1.25rem; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <span style="font-size:1.6rem;">🔄</span>
+              <div>
+                <strong style="color:#0f5a34; font-size:0.95rem;">Statutory Weekly Quota Cycle: Monday to Sunday</strong>
+                <div style="color:#166534; font-size:0.8rem; margin-top:2px;">
+                  Limits reset automatically after Sunday 11:59 PM (Monday 00:00 AM). <strong>All past token reservations & counter collection history are permanently stored.</strong>
+                </div>
+              </div>
+            </div>
+            <span class="badge" style="background:#16a34a; color:#ffffff; font-size:0.75rem; padding:0.4rem 0.8rem; border-radius:6px; font-weight:700;">
+              History Stored Permanently
+            </span>
           </div>
 
           <!-- Main Quota Gauge Component -->

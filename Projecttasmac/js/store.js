@@ -48,6 +48,11 @@ class TasmacStore {
       legalRestrictions: initial?.legalRestrictions || JSON.parse(JSON.stringify(data.legalRestrictions || []))
     };
 
+    // Ensure users array is never empty when data is reset or deleted
+    if (!this.state.users || this.state.users.length === 0) {
+      this.state.users = JSON.parse(JSON.stringify(data.demoUsers || []));
+    }
+
     // Reconcile and merge all demo personas into state.users
     (data.demoUsers || []).forEach(demoUser => {
       const idx = this.state.users.findIndex(u => u.aadhaarNumber === demoUser.aadhaarNumber);
@@ -64,6 +69,14 @@ class TasmacStore {
         if (demoUser.isBlacklisted) this.state.users[idx].isBlacklisted = true;
         if (demoUser.age) this.state.users[idx].age = demoUser.age;
         if (demoUser.dob) this.state.users[idx].dob = demoUser.dob;
+        if (demoUser.gender) this.state.users[idx].gender = demoUser.gender;
+        if (demoUser.careOf) this.state.users[idx].careOf = demoUser.careOf;
+        if (demoUser.address) this.state.users[idx].address = demoUser.address;
+        if (demoUser.pincode) this.state.users[idx].pincode = demoUser.pincode;
+        if (demoUser.nameTamil) this.state.users[idx].nameTamil = demoUser.nameTamil;
+        if (demoUser.qrData) this.state.users[idx].qrData = demoUser.qrData;
+        if (demoUser.cardType) this.state.users[idx].cardType = demoUser.cardType;
+        if (demoUser.dailyLimits) this.state.users[idx].dailyLimits = demoUser.dailyLimits;
       }
     });
 
@@ -86,17 +99,34 @@ class TasmacStore {
       });
     }
 
-    // Reconcile dummy Aadhaar database records
+    // Reconcile dummy Aadhaar database records safely (auto-seeding on delete)
     const existingAadhaar = this.getDummyAadhaarRecords();
     const missingAadhaar = (data.demoUsers || []).filter(u => !existingAadhaar.some(r => r.aadhaarNumber === u.aadhaarNumber)).map(u => ({
       aadhaarNumber: u.aadhaarNumber,
+      aadhaarFormatted: u.aadhaarFormatted || u.aadhaarNumber.replace(/(\d{4})(?=\d)/g, "$1 "),
+      aadhaarMasked: u.aadhaarMasked || "XXXX-XXXX-" + u.aadhaarNumber.slice(-4),
       name: u.name,
-      mobile: u.phone.replace(/\D/g, "").slice(-10),
-      district: u.district,
-      city: u.city
+      nameTamil: u.nameTamil || "",
+      gender: u.gender || "Male",
+      dob: u.dob || "1990-01-01",
+      age: u.age || 30,
+      careOf: u.careOf || "S/O Government of TN",
+      address: u.address || (u.city + ", " + u.district),
+      mobile: (u.phone || "").replace(/\D/g, "").slice(-10) || "9840123456",
+      phoneMasked: u.phoneMasked || ("+91 ******" + u.aadhaarNumber.slice(-4)),
+      district: u.district || "Chennai",
+      city: u.city || "Anna Nagar",
+      pincode: u.pincode || "600040",
+      photo: u.photo || "👤",
+      cardType: u.cardType || "Resident Individual (UIDAI Smart Card)",
+      qrData: u.qrData || `UIDAI:${u.aadhaarNumber}|NAME:${u.name}|ADDR:${u.district}`
     }));
     if (existingAadhaar.length === 0 || missingAadhaar.length > 0) {
-      localStorage.setItem(this.AADHAAR_DB_KEY, JSON.stringify([...existingAadhaar, ...missingAadhaar]));
+      try {
+        localStorage.setItem(this.AADHAAR_DB_KEY, JSON.stringify([...existingAadhaar, ...missingAadhaar]));
+      } catch (err) {
+        console.warn("Storage write error for Aadhaar DB:", err);
+      }
     }
 
     // Seed dummy records immediately and preserve only sessions from this login flow.
@@ -172,17 +202,59 @@ class TasmacStore {
 
   getDummyAadhaarRecords() {
     try {
-      const records = JSON.parse(localStorage.getItem(this.AADHAAR_DB_KEY));
-      if (!Array.isArray(records) || records.some(record => !record ||
+      const raw = localStorage.getItem(this.AADHAAR_DB_KEY);
+      if (!raw) {
+        return this.seedDummyAadhaarRecords();
+      }
+      const records = JSON.parse(raw);
+      if (!Array.isArray(records) || records.length === 0 || records.some(record => !record ||
         !/^\d{12}$/.test(record.aadhaarNumber) || !/^\d{10}$/.test(record.mobile) ||
-        typeof record.name !== "string" || !record.name.trim() || /[<>&"']/.test(record.name))) throw new Error();
+        typeof record.name !== "string" || !record.name.trim() || /[<>&"']/.test(record.name))) {
+        return this.seedDummyAadhaarRecords();
+      }
       return records;
     } catch {
-      throw new Error("The dummy Aadhaar database cannot be read. Fix its records before logging in.");
+      return this.seedDummyAadhaarRecords();
     }
   }
 
-  addDummyAadhaarRecord({ aadhaarNumber, name, mobile }) {
+  seedDummyAadhaarRecords() {
+    const data = window.TASMAC_DATA || {};
+    const defaultRecords = (data.demoUsers || []).map(u => ({
+      aadhaarNumber: u.aadhaarNumber,
+      aadhaarFormatted: u.aadhaarFormatted || u.aadhaarNumber.replace(/(\d{4})(?=\d)/g, "$1 "),
+      aadhaarMasked: u.aadhaarMasked || "XXXX-XXXX-" + u.aadhaarNumber.slice(-4),
+      name: u.name,
+      nameTamil: u.nameTamil || "",
+      gender: u.gender || "Male",
+      dob: u.dob || "1990-01-01",
+      age: u.age || 30,
+      careOf: u.careOf || "S/O Government of TN",
+      address: u.address || (u.city + ", " + u.district),
+      mobile: (u.phone || "").replace(/\D/g, "").slice(-10) || "9840123456",
+      phoneMasked: u.phoneMasked || ("+91 ******" + u.aadhaarNumber.slice(-4)),
+      district: u.district || "Chennai",
+      city: u.city || "Anna Nagar",
+      pincode: u.pincode || "600040",
+      photo: u.photo || "👤",
+      cardType: u.cardType || "Resident Individual (UIDAI Smart Card)",
+      qrData: u.qrData || `UIDAI:${u.aadhaarNumber}|NAME:${u.name}|ADDR:${u.district}`
+    }));
+    try {
+      localStorage.setItem(this.AADHAAR_DB_KEY, JSON.stringify(defaultRecords));
+    } catch (err) {
+      console.warn("Storage seed write error:", err);
+    }
+    return defaultRecords;
+  }
+
+  getAadhaarCard(aadhaarNumber) {
+    const clean = String(aadhaarNumber || "").replace(/\s+/g, "");
+    const records = this.getDummyAadhaarRecords();
+    return records.find(r => r.aadhaarNumber === clean) || null;
+  }
+
+  addDummyAadhaarRecord({ aadhaarNumber, name, mobile, district, city, address, dob, gender, careOf }) {
     aadhaarNumber = String(aadhaarNumber).replace(/\s+/g, "");
     mobile = String(mobile).replace(/\s+/g, "");
     name = String(name).trim();
@@ -191,8 +263,32 @@ class TasmacStore {
     if (name.length < 2 || name.length > 80 || /[<>&"']/.test(name)) throw new Error("Enter a name between 2 and 80 characters using letters, spaces or periods.");
     const records = this.getDummyAadhaarRecords();
     if (records.some(record => record.aadhaarNumber === aadhaarNumber)) throw new Error("This Aadhaar already exists in the dummy database.");
-    const record = { aadhaarNumber, name, mobile, district: this.state.selectedDistrict, city: this.state.selectedCity === "All" ? "Central" : this.state.selectedCity };
-    localStorage.setItem(this.AADHAAR_DB_KEY, JSON.stringify([...records, record]));
+    const record = {
+      aadhaarNumber,
+      aadhaarFormatted: aadhaarNumber.replace(/(\d{4})(?=\d)/g, "$1 "),
+      aadhaarMasked: "XXXX-XXXX-" + aadhaarNumber.slice(-4),
+      name,
+      nameTamil: "",
+      gender: gender || "Male",
+      dob: dob || "1992-01-01",
+      age: 32,
+      careOf: careOf || "S/O Demo Guardian",
+      address: address || `${city || "Central"}, ${district || this.state.selectedDistrict}`,
+      mobile,
+      phoneMasked: "+91 ******" + mobile.slice(-4),
+      district: district || this.state.selectedDistrict,
+      city: city || (this.state.selectedCity === "All" ? "Central" : this.state.selectedCity),
+      pincode: "600001",
+      photo: "👤",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      qrData: `UIDAI:${aadhaarNumber}|NAME:${name}|ADDR:${district || "Chennai"}`
+    };
+    records.push(record);
+    try {
+      localStorage.setItem(this.AADHAAR_DB_KEY, JSON.stringify(records));
+    } catch (err) {
+      console.warn("Could not save new dummy record:", err);
+    }
     return record;
   }
 
@@ -240,7 +336,25 @@ class TasmacStore {
       };
       this.state.users.push(user);
     }
-    Object.assign(user, { name: record.name, phone: "+91 " + record.mobile, phoneMasked: "+91 ******" + record.mobile.slice(-4), district: record.district, city: record.city });
+    Object.assign(user, {
+      name: record.name,
+      nameTamil: record.nameTamil || user.nameTamil || "",
+      phone: "+91 " + record.mobile,
+      phoneMasked: "+91 ******" + record.mobile.slice(-4),
+      district: record.district,
+      city: record.city,
+      address: record.address || user.address,
+      careOf: record.careOf || user.careOf,
+      dob: record.dob || user.dob,
+      age: record.age || user.age,
+      gender: record.gender || user.gender,
+      pincode: record.pincode || user.pincode,
+      photo: record.photo || user.photo || "👤",
+      cardType: record.cardType || user.cardType,
+      qrData: record.qrData || user.qrData,
+      aadhaarFormatted: record.aadhaarFormatted || clean.replace(/(\d{4})(?=\d)/g, "$1 "),
+      aadhaarMasked: record.aadhaarMasked || "XXXX-XXXX-" + clean.slice(-4)
+    });
     this.pendingOtp = null;
     this.state.currentUser = user;
     this.state.isAdmin = false;
@@ -276,14 +390,81 @@ class TasmacStore {
     }
   }
 
+  // --- Monday-to-Sunday Weekly Cycle Engine ---
+  // Calculates next Monday at 00:00:00 (exact moment Sunday ends and new week starts)
+  getNextMondayReset(refDate = new Date()) {
+    const d = new Date(refDate);
+    const day = d.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    // Monday to Sunday cycle:
+    // If today is Sunday (0), next day is Monday (1 day away).
+    // If today is Monday (1), next Monday is 7 days away.
+    const daysUntilNextMonday = day === 0 ? 1 : (8 - day);
+    d.setDate(d.getDate() + daysUntilNextMonday);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  getCurrentWeeklyCycle(refDate = new Date()) {
+    const now = new Date(refDate);
+    const day = now.getDay();
+    const daysSinceMonday = day === 0 ? 6 : (day - 1);
+    const cycleStart = new Date(now);
+    cycleStart.setDate(cycleStart.getDate() - daysSinceMonday);
+    cycleStart.setHours(0, 0, 0, 0);
+
+    const cycleEnd = new Date(cycleStart);
+    cycleEnd.setDate(cycleEnd.getDate() + 6);
+    cycleEnd.setHours(23, 59, 59, 999);
+
+    const nextReset = this.getNextMondayReset(now);
+
+    return {
+      cycleStart,
+      cycleEnd,
+      nextReset,
+      cycleLabel: "Monday to Sunday",
+      resetDescription: "Automatic reset after Sunday 11:59 PM (Monday 00:00 AM)"
+    };
+  }
+
+  checkAndResetWeeklyLimits(user) {
+    if (!user || !user.weeklyQuota) return;
+    const now = new Date();
+    const resetDate = new Date(user.weeklyQuota.alcoholResetDate || 0);
+
+    // If cycle expired (now is past Sunday 23:59:59 into Monday or later)
+    if (isNaN(resetDate.getTime()) || now >= resetDate) {
+      const nextMonday = this.getNextMondayReset(now);
+
+      // Reset consumption counters for the new week
+      user.weeklyQuota.alcoholUsedUnits = 0;
+      user.weeklyQuota.highNicotineUsed = 0;
+      user.weeklyQuota.lowNicotineUsed = 0;
+      user.weeklyQuota.alcoholResetDate = nextMonday.toISOString();
+
+      if (user.dailyLimits) {
+        user.dailyLimits.hotUsed = 0;
+        user.dailyLimits.nonHotUsed = 0;
+        user.dailyLimits.date = now.toISOString().split("T")[0];
+      }
+
+      // NOTE: History (this.state.purchases and this.state.bookings) is NEVER deleted!
+      // Past bookings and receipts are stored permanently.
+      this.saveState();
+    }
+  }
+
   // Limit & Quota Calculations
   getUserLimits(user = this.state.currentUser) {
+    const cycle = this.getCurrentWeeklyCycle();
+
     if (!user) {
       return {
         isRestricted: false,
         isUnderage: false,
         isBlacklisted: false,
-        alcohol: { max: 1.0, used: 0, remaining: 1.0, percent: 0, isReached: false, resetDate: "2026-09-14T00:00:00+05:30" },
+        cycleInfo: cycle,
+        alcohol: { max: 1.0, used: 0, remaining: 1.0, percent: 0, isReached: false, resetDate: cycle.nextReset.toISOString() },
         cigarettes: {
           hasAlcoholUsed: false,
           high: { max: 5, used: 0, remaining: 5, percent: 0, isReached: false },
@@ -292,12 +473,15 @@ class TasmacStore {
       };
     }
 
+    // Auto-check and trigger weekly reset if Sunday has passed
+    this.checkAndResetWeeklyLimits(user);
+
     const quota = user.weeklyQuota || {
       alcoholUsedUnits: 0,
       maxAlcoholUnits: 1.0,
       highNicotineUsed: 0,
       lowNicotineUsed: 0,
-      alcoholResetDate: "2026-09-14T00:00:00+05:30"
+      alcoholResetDate: cycle.nextReset.toISOString()
     };
 
     const isRestricted = !!user.isRestricted;
@@ -662,18 +846,25 @@ class TasmacStore {
     const user = this.state.users.find(u => u.aadhaarNumber === aadhaarNumber);
     if (!user) throw new Error("User not found");
 
+    const nextMonday = this.getNextMondayReset();
     user.weeklyQuota = {
       alcoholUsedUnits: 0,
       maxAlcoholUnits: 1.0,
-      alcoholResetDate: "2026-09-14T00:00:00+05:30",
+      alcoholResetDate: nextMonday.toISOString(),
       highNicotineUsed: 0,
       lowNicotineUsed: 0
     };
+    if (user.dailyLimits) {
+      user.dailyLimits.hotUsed = 0;
+      user.dailyLimits.nonHotUsed = 0;
+      user.dailyLimits.date = new Date().toISOString().split("T")[0];
+    }
 
     if (this.state.currentUser?.aadhaarNumber === aadhaarNumber) {
       this.state.currentUser = user;
     }
 
+    // Historical purchases and bookings remain stored permanently!
     this.notify();
     return user;
   }

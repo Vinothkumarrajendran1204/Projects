@@ -673,76 +673,164 @@ const TASMAC_DATA = {
     }
   ],
 
-  // Realistic mock users for testing different limit & restriction states
+  // Realistic mock users for testing different limit & restriction states with full Aadhaar card & user profile details
   demoUsers: [
     {
-      aadhaarNumber: "456789012345", // Masked: XXXX-XXXX-2345
+      aadhaarNumber: "456789012345",
+      aadhaarFormatted: "4567 8901 2345",
+      aadhaarMasked: "XXXX-XXXX-2345",
+      customerId: "TN-DEMO-2345",
       name: "Rajesh Kannan",
+      nameTamil: "ராஜேஷ் கண்ணன்",
+      gender: "Male",
+      dob: "1990-05-14",
+      age: 34,
+      careOf: "S/O K. Ramanathan",
       phone: "+91 98401 23456",
       phoneMasked: "+91 98*** **456",
+      address: "Door No. 42, 2nd Avenue, Block AB, Anna Nagar West, Chennai - 600040",
       district: "Chennai",
       city: "Anna Nagar",
+      pincode: "600040",
+      enrolmentNo: "2026/00142/08912",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2016-04-12",
+      photo: "👤",
+      qrData: "UIDAI:456789012345|NAME:Rajesh Kannan|DOB:1990-05-14|GEN:M|ADDR:Chennai-600040",
       isRestricted: false,
+      restrictionStatus: "Cleared",
       restrictionDetails: null,
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 1,
+        nonHotUsed: 0,
+        nonHotMax: 2,
+        date: "2026-09-18"
+      },
       weeklyQuota: {
-        // 1.0 = 1 full bottle Hard Liquor OR 2 Beers (0.5 each) OR 2 Wines (0.5 each)
         alcoholUsedUnits: 0,
         maxAlcoholUnits: 1.0,
-        alcoholResetDate: "2026-09-14T00:00:00+05:30", // Next Monday
-        // Cigarettes: Alcohol used == 0 => High 5, Low 10
+        alcoholResetDate: "2026-09-21T00:00:00+05:30",
         highNicotineUsed: 0,
-        lowNicotineUsed: 0
+        lowNicotineUsed: 0,
+        maxHighNicotine: 5,
+        maxLowNicotine: 10
       },
       personaBadge: "Clean Citizen (Full Limit Available)",
       personaDescription: "New cycle. Zero quota used. Can book 1 full bottle OR 2 beers OR 2 wines. Full cigarette limit (5 High / 10 Low)."
     },
     {
-      aadhaarNumber: "345678901234", // Masked: XXXX-XXXX-1234
+      aadhaarNumber: "345678901234",
+      aadhaarFormatted: "3456 7890 1234",
+      aadhaarMasked: "XXXX-XXXX-1234",
+      customerId: "TN-DEMO-1234",
       name: "S. Murugan",
+      nameTamil: "எஸ். முருகன்",
+      gender: "Male",
+      dob: "1985-11-22",
+      age: 38,
+      careOf: "S/O M. Subramanian",
       phone: "+91 94440 98765",
       phoneMasked: "+91 94*** **765",
+      address: "Door No. 18, South Usman Road, T. Nagar, Chennai - 600017",
       district: "Chennai",
       city: "T. Nagar",
+      pincode: "600017",
+      enrolmentNo: "2026/00142/07541",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2015-08-19",
+      photo: "👤",
+      qrData: "UIDAI:345678901234|NAME:S. Murugan|DOB:1985-11-22|GEN:M|ADDR:Chennai-600017",
       isRestricted: false,
+      restrictionStatus: "Cleared",
       restrictionDetails: null,
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 1,
+        nonHotUsed: 1,
+        nonHotMax: 2,
+        date: "2026-09-18"
+      },
       weeklyQuota: {
-        alcoholUsedUnits: 0.5, // Used 1 Beer (0.5 units) -> 0.5 units remaining (can buy 1 more beer or 1 wine)
+        alcoholUsedUnits: 0.5,
         maxAlcoholUnits: 1.0,
-        alcoholResetDate: "2026-09-14T00:00:00+05:30",
-        // Since alcoholUsedUnits > 0: Cigarette limits reduced to max 3 High / 6 Low!
+        alcoholResetDate: "2026-09-21T00:00:00+05:30",
         highNicotineUsed: 1,
-        lowNicotineUsed: 2
+        lowNicotineUsed: 2,
+        maxHighNicotine: 3,
+        maxLowNicotine: 6
       },
       personaBadge: "Active Citizen (Partial Limit Used)",
       personaDescription: "Consumed 1 Beer (0.5 unit). Cigarette limits dynamically reduced from 5/10 to 3/6."
     },
     {
-      aadhaarNumber: "901234567890", // Masked: XXXX-XXXX-7890
+      aadhaarNumber: "901234567890",
+      aadhaarFormatted: "9012 3456 7890",
+      aadhaarMasked: "XXXX-XXXX-7890",
+      customerId: "TN-DEMO-7890",
       name: "M. Vijay",
+      nameTamil: "எம். விஜய்",
+      gender: "Male",
+      dob: "1992-03-08",
+      age: 32,
+      careOf: "S/O P. Manickam",
       phone: "+91 97910 44321",
       phoneMasked: "+91 97*** **321",
+      address: "Plot No. 105, 100 Feet Bypass Road, Velachery, Chennai - 600042",
       district: "Chennai",
       city: "Velachery",
+      pincode: "600042",
+      enrolmentNo: "2026/00142/09124",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2017-02-11",
+      photo: "👤",
+      qrData: "UIDAI:901234567890|NAME:M. Vijay|DOB:1992-03-08|GEN:M|ADDR:Chennai-600042",
       isRestricted: false,
+      restrictionStatus: "Cleared",
       restrictionDetails: null,
+      dailyLimits: {
+        hotUsed: 1,
+        hotMax: 1,
+        nonHotUsed: 2,
+        nonHotMax: 2,
+        date: "2026-09-18"
+      },
       weeklyQuota: {
-        alcoholUsedUnits: 1.0, // Limit exhausted!
+        alcoholUsedUnits: 1.0,
         maxAlcoholUnits: 1.0,
-        alcoholResetDate: "2026-09-14T00:00:00+05:30",
+        alcoholResetDate: "2026-09-21T00:00:00+05:30",
         highNicotineUsed: 2,
-        lowNicotineUsed: 4
+        lowNicotineUsed: 4,
+        maxHighNicotine: 3,
+        maxLowNicotine: 6
       },
       personaBadge: "Limit Reached Citizen (Booking Blocked)",
       personaDescription: "Weekly alcohol quota completely exhausted (1.0 unit used). Alcohol booking is disabled."
     },
     {
-      aadhaarNumber: "789012345678", // Masked: XXXX-XXXX-5678
+      aadhaarNumber: "789012345678",
+      aadhaarFormatted: "7890 1234 5678",
+      aadhaarMasked: "XXXX-XXXX-5678",
+      customerId: "TN-DEMO-5678",
       name: "V. Anbarasan",
+      nameTamil: "வி. அன்பரசன்",
+      gender: "Male",
+      dob: "1987-09-19",
+      age: 37,
+      careOf: "S/O T. Veluchamy",
       phone: "+91 99402 11987",
       phoneMasked: "+91 99*** **987",
+      address: "Flat 3B, Shanti Colony, 4th Main Road, Anna Nagar, Chennai - 600040",
       district: "Chennai",
       city: "Anna Nagar",
+      pincode: "600040",
+      enrolmentNo: "2026/00142/04481",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2015-10-04",
+      photo: "👤",
+      qrData: "UIDAI:789012345678|NAME:V. Anbarasan|DOB:1987-09-19|GEN:M|ADDR:Chennai-600040",
       isRestricted: true,
+      restrictionStatus: "Temporarily Restricted (DUI)",
       restrictionDetails: {
         caseNumber: "TN-POL-2026-DUI-8821",
         policeStation: "Anna Nagar Traffic Police (TIW-West)",
@@ -754,27 +842,50 @@ const TASMAC_DATA = {
         statusNote: "License suspended for 90 days. Mandatory de-addiction counseling pending. All TASMAC liquor bookings barred.",
         canAppeal: true
       },
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 0,
+        nonHotUsed: 0,
+        nonHotMax: 0,
+        date: "2026-09-18"
+      },
       weeklyQuota: {
         alcoholUsedUnits: 0,
-        maxAlcoholUnits: 0, // Blocked
+        maxAlcoholUnits: 0,
         alcoholResetDate: "2026-11-15T00:00:00+05:30",
         highNicotineUsed: 0,
-        lowNicotineUsed: 0
+        lowNicotineUsed: 0,
+        maxHighNicotine: 0,
+        maxLowNicotine: 0
       },
       personaBadge: "Legally Restricted Account (DUI Recorded)",
       personaDescription: "Legally recorded Drunk Driving case under MVA Sec 185. Alcohol booking barred by government order."
     },
     {
-      aadhaarNumber: "234567890123", // Masked: XXXX-XXXX-0123
+      aadhaarNumber: "234567890123",
+      aadhaarFormatted: "2345 6789 0123",
+      aadhaarMasked: "XXXX-XXXX-0123",
+      customerId: "TN-DEMO-0123",
       name: "K. Rahul (Minor - Age 17)",
+      nameTamil: "கே. ராகுல் (சிறார் - 17 வயது)",
+      gender: "Male",
       age: 17,
       dob: "2009-08-14",
+      careOf: "S/O R. Krishnan",
       phone: "+91 98840 77123",
       phoneMasked: "+91 98*** **123",
+      address: "No. 15, Race Course Road, Guindy, Chennai - 600032",
       district: "Chennai",
       city: "Guindy",
+      pincode: "600032",
+      enrolmentNo: "2026/00142/02901",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2018-09-15",
+      photo: "👤",
+      qrData: "UIDAI:234567890123|NAME:K. Rahul|DOB:2009-08-14|GEN:M|ADDR:Chennai-600032",
       isRestricted: true,
       isUnderage: true,
+      restrictionStatus: "Underage Minor Barred (<18)",
       restrictionDetails: {
         caseNumber: "TN-AGE-2026-MIN-1704",
         policeStation: "Social Welfare & Prohibition Enforcement Wing",
@@ -787,9 +898,16 @@ const TASMAC_DATA = {
         canAppeal: false,
         isUnderage: true
       },
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 0,
+        nonHotUsed: 0,
+        nonHotMax: 0,
+        date: "2026-09-18"
+      },
       weeklyQuota: {
         alcoholUsedUnits: 0,
-        maxAlcoholUnits: 0, // Blocked
+        maxAlcoholUnits: 0,
         alcoholResetDate: "2027-08-14T00:00:00+05:30",
         highNicotineUsed: 0,
         lowNicotineUsed: 0,
@@ -800,15 +918,30 @@ const TASMAC_DATA = {
       personaDescription: "Age 17. Blocked under TN Prohibition Act Sec 19 & COTPA Sec 6. All alcohol and tobacco bookings strictly barred."
     },
     {
-      aadhaarNumber: "112233445566", // Masked: XXXX-XXXX-5566
+      aadhaarNumber: "112233445566",
+      aadhaarFormatted: "1122 3344 5566",
+      aadhaarMasked: "XXXX-XXXX-5566",
+      customerId: "TN-DEMO-5566",
       name: "P. Karthikeyan",
+      nameTamil: "பி. கார்த்திகேயன்",
+      gender: "Male",
       age: 34,
+      dob: "1990-01-25",
+      careOf: "S/O S. Perumal",
       phone: "+91 98410 99887",
       phoneMasked: "+91 98*** **887",
+      address: "Door No. 8, Ranganathan Street, T. Nagar, Chennai - 600017",
       district: "Chennai",
       city: "T. Nagar",
+      pincode: "600017",
+      enrolmentNo: "2026/00142/06633",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2016-12-05",
+      photo: "👤",
+      qrData: "UIDAI:112233445566|NAME:P. Karthikeyan|DOB:1990-01-25|GEN:M|ADDR:Chennai-600017",
       isRestricted: true,
       isUnderage: false,
+      restrictionStatus: "Court Restraining Order (IPC 323/324)",
       restrictionDetails: {
         caseNumber: "TN-POL-2026-CR-4512",
         policeStation: "T. Nagar Police Station (Law & Order)",
@@ -820,26 +953,50 @@ const TASMAC_DATA = {
         statusNote: "Court-mandated prohibition order for alcohol-fueled public affray. 6-month restraining order from TASMAC retail outlets.",
         canAppeal: true
       },
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 0,
+        nonHotUsed: 0,
+        nonHotMax: 0,
+        date: "2026-09-18"
+      },
       weeklyQuota: {
         alcoholUsedUnits: 0,
-        maxAlcoholUnits: 0, // Blocked
+        maxAlcoholUnits: 0,
         alcoholResetDate: "2027-01-10T00:00:00+05:30",
         highNicotineUsed: 0,
-        lowNicotineUsed: 0
+        lowNicotineUsed: 0,
+        maxHighNicotine: 0,
+        maxLowNicotine: 0
       },
       personaBadge: "Court Prohibited Account (Public Affray & Violence)",
       personaDescription: "Court-mandated prohibition order under IPC 323/324 for alcohol-fueled public disturbance. Alcohol bookings barred."
     },
     {
-      aadhaarNumber: "667788990011", // Masked: XXXX-XXXX-0011
+      aadhaarNumber: "667788990011",
+      aadhaarFormatted: "6677 8899 0011",
+      aadhaarMasked: "XXXX-XXXX-0011",
+      customerId: "TN-DEMO-0011",
       name: "M. Saravanan",
+      nameTamil: "எம். சரவணன்",
+      gender: "Male",
       age: 41,
+      dob: "1983-06-12",
+      careOf: "S/O D. Muthu",
       phone: "+91 97890 12345",
       phoneMasked: "+91 97*** **345",
+      address: "Old No. 71, Kutchery Road, Mylapore, Chennai - 600004",
       district: "Chennai",
       city: "Mylapore",
+      pincode: "600004",
+      enrolmentNo: "2026/00142/01198",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2014-03-27",
+      photo: "👤",
+      qrData: "UIDAI:667788990011|NAME:M. Saravanan|DOB:1983-06-12|GEN:M|ADDR:Chennai-600004",
       isRestricted: true,
       isBlacklisted: true,
+      restrictionStatus: "Vigilance Blacklist (Bootlegging)",
       restrictionDetails: {
         caseNumber: "TASMAC-VIG-2026-BLK-309",
         policeStation: "TASMAC State Vigilance & Anti-Hoarding Squad",
@@ -851,9 +1008,16 @@ const TASMAC_DATA = {
         statusNote: "Blacklisted for systemic misuse of retail quotas for illegal bulk hoarding and resale. All portal booking privileges revoked.",
         canAppeal: false
       },
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 0,
+        nonHotUsed: 0,
+        nonHotMax: 0,
+        date: "2026-09-18"
+      },
       weeklyQuota: {
         alcoholUsedUnits: 0,
-        maxAlcoholUnits: 0, // Blocked
+        maxAlcoholUnits: 0,
         alcoholResetDate: "2027-06-01T00:00:00+05:30",
         highNicotineUsed: 0,
         lowNicotineUsed: 0,
@@ -862,6 +1026,148 @@ const TASMAC_DATA = {
       },
       personaBadge: "Blacklisted Citizen (Commercial Resale / Bootlegging)",
       personaDescription: "Blacklisted by TASMAC Vigilance under TNPA Sec 4 for bulk hoarding and unauthorized resale. All purchases barred."
+    },
+    {
+      aadhaarNumber: "999988887777",
+      aadhaarFormatted: "9999 8888 7777",
+      aadhaarMasked: "XXXX-XXXX-7777",
+      customerId: "TN-DEMO-7777",
+      name: "R. Karthik",
+      nameTamil: "ஆர். கார்த்திக்",
+      gender: "Male",
+      age: 30,
+      dob: "1994-10-04",
+      careOf: "S/O G. Rajendran",
+      phone: "+91 98405 67890",
+      phoneMasked: "+91 98*** **890",
+      address: "Door No. 12, 1st Main Road, Besant Nagar, Adyar, Chennai - 600090",
+      district: "Chennai",
+      city: "Adyar",
+      pincode: "600090",
+      enrolmentNo: "2026/00142/05562",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2016-07-22",
+      photo: "👤",
+      qrData: "UIDAI:999988887777|NAME:R. Karthik|DOB:1994-10-04|GEN:M|ADDR:Chennai-600090",
+      isRestricted: true,
+      restrictionStatus: "Temporarily Restricted (DUI Citation)",
+      restrictionDetails: {
+        caseNumber: "UAL-CASE-DUI-9988",
+        policeStation: "Adyar Traffic Police (TIW-South)",
+        offenceType: "Drink-and-Drive Violation Notice (Sec 185 MVA)",
+        bloodAlcoholLevel: "74 mg / 100 ml (Legal limit: 30 mg)",
+        imposedDate: "2026-08-20",
+        reviewDate: "2026-11-20",
+        sanctionAuthority: "Greater Chennai Traffic Police & Transport Dept",
+        statusNote: "Drink-and-drive violation notice registered. Portal alcohol token reservations suspended pending RTO clearance.",
+        canAppeal: true
+      },
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 0,
+        nonHotUsed: 0,
+        nonHotMax: 0,
+        date: "2026-09-18"
+      },
+      weeklyQuota: {
+        alcoholUsedUnits: 0,
+        maxAlcoholUnits: 0,
+        alcoholResetDate: "2026-11-20T00:00:00+05:30",
+        highNicotineUsed: 0,
+        lowNicotineUsed: 0,
+        maxHighNicotine: 0,
+        maxLowNicotine: 0
+      },
+      personaBadge: "Restricted Account (Drink & Drive Notice)",
+      personaDescription: "Drink-and-drive violation citation recorded by Traffic Police. Booking privileges temporarily suspended."
+    },
+    {
+      aadhaarNumber: "554433221100",
+      aadhaarFormatted: "5544 3322 1100",
+      aadhaarMasked: "XXXX-XXXX-1100",
+      customerId: "TN-DEMO-1100",
+      name: "Smt. Priya Sundaram",
+      nameTamil: "திருமதி. பிரியா சுந்தரம்",
+      gender: "Female",
+      age: 33,
+      dob: "1991-04-18",
+      careOf: "W/O R. Sundaram",
+      phone: "+91 98403 45678",
+      phoneMasked: "+91 98*** **678",
+      address: "Plot No. 28, Gandhi Nagar 1st Cross, Adyar, Chennai - 600020",
+      district: "Chennai",
+      city: "Adyar",
+      pincode: "600020",
+      enrolmentNo: "2026/00142/03389",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2015-11-30",
+      photo: "👤",
+      qrData: "UIDAI:554433221100|NAME:Priya Sundaram|DOB:1991-04-18|GEN:F|ADDR:Chennai-600020",
+      isRestricted: false,
+      restrictionStatus: "Cleared",
+      restrictionDetails: null,
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 1,
+        nonHotUsed: 0,
+        nonHotMax: 2,
+        date: "2026-09-18"
+      },
+      weeklyQuota: {
+        alcoholUsedUnits: 0,
+        maxAlcoholUnits: 1.0,
+        alcoholResetDate: "2026-09-21T00:00:00+05:30",
+        highNicotineUsed: 0,
+        lowNicotineUsed: 0,
+        maxHighNicotine: 5,
+        maxLowNicotine: 10
+      },
+      personaBadge: "Clean Citizen (Wine & Beer Quota Active)",
+      personaDescription: "Verified resident profile. Full quota eligible across all TASMAC retail and Elite boutiques."
+    },
+    {
+      aadhaarNumber: "887766554433",
+      aadhaarFormatted: "8877 6655 4433",
+      aadhaarMasked: "XXXX-XXXX-4433",
+      customerId: "TN-DEMO-4433",
+      name: "A. Mohammed Farooq",
+      nameTamil: "ஏ. முகமது பாரூக்",
+      gender: "Male",
+      age: 35,
+      dob: "1989-12-05",
+      careOf: "S/O K. Abdul Rahman",
+      phone: "+91 94432 11223",
+      phoneMasked: "+91 94*** **223",
+      address: "Door No. 56, Cross Cut Road, Gandhipuram, Coimbatore - 641012",
+      district: "Coimbatore",
+      city: "Gandhipuram",
+      pincode: "641012",
+      enrolmentNo: "2026/00142/08871",
+      cardType: "Resident Individual (UIDAI Smart Card)",
+      issuedDate: "2017-06-18",
+      photo: "👤",
+      qrData: "UIDAI:887766554433|NAME:A. Mohammed Farooq|DOB:1989-12-05|GEN:M|ADDR:Coimbatore-641012",
+      isRestricted: false,
+      restrictionStatus: "Cleared",
+      restrictionDetails: null,
+      dailyLimits: {
+        hotUsed: 0,
+        hotMax: 1,
+        nonHotUsed: 0,
+        nonHotMax: 2,
+        date: "2026-09-18"
+      },
+      weeklyQuota: {
+        alcoholUsedUnits: 0,
+        maxAlcoholUnits: 1.0,
+        alcoholResetDate: "2026-09-21T00:00:00+05:30",
+        highNicotineUsed: 0,
+        lowNicotineUsed: 0,
+        maxHighNicotine: 5,
+        maxLowNicotine: 10
+      },
+      personaBadge: "Clean Citizen (Coimbatore District)",
+      personaDescription: "Verified Coimbatore resident. Eligible for booking tokens at Coimbatore Gandhipuram & RS Puram shops."
     }
   ],
 
